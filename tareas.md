@@ -478,52 +478,52 @@
 
 ### 4.2 — Clientes Supabase
 
-- [ ] 4.2.1 — Crear `lib/supabase/client.ts` (browser client)
-- [ ] 4.2.2 — Crear `lib/supabase/server.ts` (server client con cookies)
-- [ ] 4.2.3 — Crear `lib/supabase/middleware.ts` (helper para `middleware.ts`)
-- [ ] 4.2.4 — Verificar tipos: `pnpm add -D supabase` y `pnpm supabase gen types typescript --project-id <ref> > types/database.ts`
+- [1] 4.2.1 — Crear `lib/supabase/client.ts` (browser client)
+- [1] 4.2.2 — Crear `lib/supabase/server.ts` (server client con cookies)
+- [1] 4.2.3 — Crear `lib/supabase/middleware.ts` (helper para `middleware.ts`)
+- [1] 4.2.4 — Verificar tipos: `pnpm add -D supabase` y `pnpm supabase gen types typescript --project-id <ref> > types/database.ts`
 
 ### 4.3 — Middleware de protección
 
-- [ ] 4.3.1 — Crear `middleware.ts` en la raíz
-- [ ] 4.3.2 — Si la ruta empieza con `/dashboard` y no hay sesión → redirect a `/login`
-- [ ] 4.3.3 — Si la ruta es `/login` y hay sesión → redirect a `/dashboard`
-- [ ] 4.3.4 — Test manual: cerrar sesión y verificar redirect
+- [1] 4.3.1 — Crear `middleware.ts` en la raíz
+- [1] 4.3.2 — Si la ruta empieza con `/dashboard` y no hay sesión → redirect a `/login`
+- [1] 4.3.3 — Si la ruta es `/login` y hay sesión → redirect a `/dashboard`
+- [1] 4.3.4 — Test manual: cerrar sesión y verificar redirect
 
 ### 4.4 — Página de Login
 
-- [ ] 4.4.1 — Crear `app/(auth)/login/page.tsx`
-- [ ] 4.4.2 — Layout con logo Alebrijes centrado
-- [ ] 4.4.3 — Form con email + password (componentes shadcn)
-- [ ] 4.4.4 — Submit llama `supabase.auth.signInWithPassword`
-- [ ] 4.4.5 — Si éxito → `router.push('/dashboard')`
-- [ ] 4.4.6 — Si error → toast de error
-- [ ] 4.4.7 — Loading state en el botón
-- [ ] 4.4.8 — Commit: `feat(auth): login page with supabase auth`
+- [1] 4.4.1 — Crear `app/(auth)/login/page.tsx`
+- [1] 4.4.2 — Layout con logo Alebrijes centrado
+- [1] 4.4.3 — Form con email + password (componentes shadcn)
+- [1] 4.4.4 — Submit llama `supabase.auth.signInWithPassword`
+- [1] 4.4.5 — Si éxito → `router.push('/dashboard')`
+- [1] 4.4.6 — Si error → toast de error
+- [1] 4.4.7 — Loading state en el botón
+- [1] 4.4.8 — Commit: `feat(auth): login page with supabase auth`
 
 ### 4.5 — Layout del Dashboard
 
-- [ ] 4.5.1 — Crear `app/(app)/dashboard/layout.tsx`
-- [ ] 4.5.2 — Estructura: `<Sidebar />` a la izquierda, `<Topbar />` arriba, contenido
-- [ ] 4.5.3 — Crear `components/dashboard/sidebar.tsx`:
-  - [ ] 4.5.3.1 — Logo de Alebrijes (`/assets/alebrijes-escudo.png`)
-  - [ ] 4.5.3.2 — Links: Dashboard, Clientes, Comprobantes, Desconocidos, Mensajes, Reportes, Configuración
-  - [ ] 4.5.3.3 — Badge en "Comprobantes" con count de pendientes (query a `comprobantes_recibidos where estado='pendiente'`)
-  - [ ] 4.5.3.4 — Badge en "Desconocidos" con count
-  - [ ] 4.5.3.5 — Footer con email del admin y botón logout
-  - [ ] 4.5.3.6 — Responsive: drawer/hamburger en móvil
-- [ ] 4.5.4 — Crear `components/dashboard/topbar.tsx`:
-  - [ ] 4.5.4.1 — Breadcrumb dinámico
-  - [ ] 4.5.4.2 — Mes actual formateado en español
-  - [ ] 4.5.4.3 — Botón logout (mobile)
-- [ ] 4.5.5 — Crear `app/(app)/dashboard/page.tsx` con un placeholder "Bienvenido" por ahora
-- [ ] 4.5.6 — Commit: `feat(dashboard): layout with sidebar and topbar`
+- [1] 4.5.1 — Crear `app/(app)/dashboard/layout.tsx`
+- [1] 4.5.2 — Estructura: `<Sidebar />` a la izquierda, `<Topbar />` arriba, contenido
+- [1] 4.5.3 — Crear `components/dashboard/sidebar.tsx`:
+  - [1] 4.5.3.1 — Logo de Alebrijes (`/assets/alebrijes-escudo.png`)
+  - [1] 4.5.3.2 — Links: Dashboard, Clientes, Comprobantes, Desconocidos, Mensajes, Reportes, Configuración
+  - [1] 4.5.3.3 — Badge en "Comprobantes" con count de pendientes (query a `comprobantes_recibidos where estado='pendiente'`)
+  - [1] 4.5.3.4 — Badge en "Desconocidos" con count
+  - [1] 4.5.3.5 — Footer con email del admin y botón logout
+  - [1] 4.5.3.6 — Responsive: drawer/hamburger en móvil
+- [1] 4.5.4 — Crear `components/dashboard/topbar.tsx`:
+  - [1] 4.5.4.1 — Breadcrumb dinámico
+  - [1] 4.5.4.2 — Mes actual formateado en español
+  - [1] 4.5.4.3 — Botón logout (mobile)
+- [1] 4.5.5 — Crear `app/(app)/dashboard/page.tsx` con un placeholder "Bienvenido" por ahora
+- [1] 4.5.6 — Commit: `feat(dashboard): layout with sidebar and topbar`
 
 ### Criterios de Salida Fase 4
-- [ ] Login funciona con Supabase Auth
-- [ ] Rutas protegidas redirigen a login si no hay sesión
-- [ ] Sidebar muestra badges de pendientes (aún en 0)
-- [ ] Layout responsive
+- [1] Login funciona con Supabase Auth
+- [1] Rutas protegidas redirigen a login si no hay sesión
+- [1] Sidebar muestra badges de pendientes (aún en 0)
+- [1] Layout responsive
 
 ---
 
@@ -533,17 +533,27 @@
 
 ### 5.1 — Listar clientes
 
-- [ ] 5.1.1 — `app/(app)/dashboard/clientes/page.tsx` (Server Component)
-- [ ] 5.1.2 — Query con service_role: `select * from clientes order by created_at desc`
-- [ ] 5.1.3 — Crear `components/clientes/cliente-table.tsx`:
-  - [ ] 5.1.3.1 — Columnas: Nombre, WhatsApp, Día, Monto, Categoría, Estado (badge activo/inactivo), Acciones
-  - [ ] 5.1.3.2 — Botón "Editar" → link a `/clientes/[id]`
-  - [ ] 5.1.3.3 — Botón "Eliminar" (soft delete: `activo=false`) con confirmación
-  - [ ] 5.1.3.4 — Search input (filtra en cliente)
-  - [ ] 5.1.3.5 — Paginación o scroll infinito
-- [ ] 5.1.4 — Botón "+ Nuevo Cliente" → link a `/clientes/nuevo`
-- [ ] 5.1.5 — Estado vacío con mensaje "Aún no hay clientes"
-- [ ] 5.1.6 — Commit: `feat(clientes): list page with table`
+- [x] 5.1.1 — `app/dashboard/clientes/page.tsx` (Server Component) — **en `app/dashboard/clientes/` sin grupo `(app)`**
+- [x] 5.1.2 — Query con service_role via `lib/queries/clientes.ts:getClientes()` (usa `getAdminClient()` con service_role key, bypass RLS)
+- [x] 5.1.3 — `components/clientes/cliente-table.tsx` (Client Component) con:
+  - [x] 5.1.3.1 — Columnas: Nombre, WhatsApp (formateado), Día (badge), Monto (MXN), Categoría, Estado (badge activo/inactivo), Acciones
+  - [x] 5.1.3.2 — Dropdown de acciones con "Editar" → link a `/clientes/[id]`
+  - [x] 5.1.3.3 — Soft delete: `activo=false` con Dialog de confirmación + opción "Reactivar" para inactivos
+  - [x] 5.1.3.4 — Search input (filtra por nombre, WhatsApp o categoría)
+  - [x] 5.1.3.5 — Paginación de 20 items/página con botones "Anterior"/"Siguiente"
+- [x] 5.1.4 — Botón "+ Nuevo Cliente" en header y en empty state → link a `/clientes/nuevo`
+- [x] 5.1.5 — Empty state con icono, mensaje "Aún no hay clientes" y CTA
+- [x] 5.1.6 — Commit: `feat(clientes): list page with table, search, pagination and soft-delete` (commit `1128af3`)
+
+### Extras incluidos
+- 🎨 **Brand aplicado**: botón naranja Alebrijes, badges con colores del tema
+- 📱 **Responsive**: tabla con scroll horizontal, filtros apilables en móvil
+- 🛡️ **Server actions** en `lib/actions/clientes.ts` con validación Zod (`clienteSchema`) y revalidatePath
+- 🧮 **Utils** en `lib/utils.ts`: `formatMXN`, `formatWhatsApp`, `getCurrentPeriodo`, `formatPeriodoLabel`, `formatRelativeTime`
+- ✅ **Sonner toasts** integrados para feedback de acciones
+- 🔁 **Server actions separados**: `createClienteAction`, `updateClienteAction`, `softDeleteClienteAction`, `reactivateClienteAction`
+- 🛡️ **Manejo de error 23505** (unique violation) en create/update con mensaje amigable
+- 🎭 **Patrón `render` de base-ui** usado en lugar de `asChild` (deprecation)
 
 ### 5.2 — Crear cliente
 
