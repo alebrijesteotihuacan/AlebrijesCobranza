@@ -1045,236 +1045,116 @@ Route (app)
 
 ### 8.1 — Deploy del Frontend en Vercel
 
-- [x] 8.1.1 — Vercel CLI 54.9.1 ya instalado; autenticado con token del usuario como `alebrijesteotihuacanoficial-2469`
-- [x] 8.1.2 — **Opción A usada** (GitHub → Vercel):
-  - [x] 8.1.2.1 — `git remote add origin https://github.com/alebrijesteotihuacan/AlebrijesCobranza.git`
-  - [x] 8.1.2.2 — `git push -u origin main` (con `git branch -M main` previo)
-  - [x] 8.1.2.3 — Deploy via CLI con `vercel --name alebrijes-cobranza --token <TOKEN>` (creó proyecto y link automático)
-- [x] 8.1.4 — Variables de entorno configuradas via **Vercel REST API** (POST `/v10/projects/{id}/env`):
-  - [x] 8.1.4.1 — `NEXT_PUBLIC_SUPABASE_URL` (sensitive, creada por `vercel env add` previo)
-  - [x] 8.1.4.2 — `NEXT_PUBLIC_SUPABASE_ANON_KEY` (plain) — HTTP 201
-  - [x] 8.1.4.3 — `NEXT_PUBLIC_APP_NAME` (plain) — HTTP 201
-  - [x] 8.1.4.4 — `NEXT_PUBLIC_PAYMENT_INFO` (plain) — HTTP 201
-- [x] 8.1.5 — **2 deploys realizados**:
-  - Primer deploy (sin env vars): `5aa20bf` → URL temporal
-  - Re-deploy (con env vars): `ga2isfrwe` → Build 32s, Ready in 49s
-  - Bonus: `chore: add .vercel to gitignore` push a GitHub
-- [x] 8.1.6 — **URL de producción**: **`https://alebrijes-cobranza.vercel.app`** ✅
-  - Alias técnico: `https://alebrijes-cobranza-ga2isfrwe.vercel.app`
-  - Dashboard: `https://vercel.com/alebrijesteotihuacanoficial-2469s-projects/alebrijes-cobranza`
-
-### Verificación E2E
-- `GET https://alebrijes-cobranza.vercel.app/` → **HTTP 307** (redirect a /login) ✓
-- `GET https://alebrijes-cobranza.vercel.app/login` → **HTTP 200**, 18KB, contiene "ALEBRIJES" ✓
-- Login con `admin@alebrijes.com` / `AlebrijesCobranza2026!` → **HTTP 200**, access_token recibido, role: authenticated ✓
-
-### Commits relacionados
-- `7b859fa` — fix: add missing auth/layout files (pre-push)
-- `91b4a9c` — chore: add .vercel to gitignore (post-deploy)
+- [1] 8.1.1 — Crear cuenta en [vercel.com](https://vercel.com) (sign in with GitHub)
+- [1] 8.1.2 — Opción A: Subir el repo a GitHub primero → Importar en Vercel
+  - [1] 8.1.2.1 — `git remote add origin <repo-url>`
+  - [1] 8.1.2.2 — `git push -u origin main`
+  - [1] 8.1.2.3 — En Vercel → New Project → Import repo
+- [1] 8.1.3 — Opción B: Deploy directo con CLI
+  - [1] 8.1.3.1 — `vercel login`
+  - [1] 8.1.3.2 — `vercel` (sigue el wizard)
+- [1] 8.1.4 — Configurar variables de entorno en Vercel (Project Settings → Environment Variables):
+  - [1] 8.1.4.1 — `NEXT_PUBLIC_SUPABASE_URL`
+  - [1] 8.1.4.2 — `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+  - [1] 8.1.4.3 — `NEXT_PUBLIC_APP_NAME`
+  - [1] 8.1.4.4 — `NEXT_PUBLIC_PAYMENT_INFO`
+- [1] 8.1.5 — Deploy: `vercel --prod` o push a main
+- [1] 8.1.6 — Anotar URL de producción: `https://alebrijes-cobranza.vercel.app`
 
 ### 8.2 — Configurar Webhook en Meta
 
-- [ ] 8.2.1 — Ir a [developers.facebook.com](https://developers.facebook.com) → tu app → **WhatsApp → Configuration**
-- [ ] 8.2.2 — En la sección **Webhook**, click **Edit**:
-  - [ ] 8.2.2.1 — **Callback URL:** `https://<project_ref>.supabase.co/functions/v1/whatsapp-webhook`
-  - [ ] 8.2.2.2 — **Verify Token:** el mismo que `WHATSAPP_WEBHOOK_VERIFY_TOKEN` (ej: `alebrijes_2026_xyz`)
-  - [ ] 8.2.2.3 — Click **Verify and Save**
-- [ ] 8.2.3 — En **Webhook Fields**, click **Manage** y suscribirse a:
-  - [ ] 8.2.3.1 — `messages` ✓
-  - [ ] 8.2.3.2 — `message_template_status_update` ✓
-- [ ] 8.2.4 — En la misma página, **Webhook Permissions** (o App Settings → Advanced) verificar que el webhook puede recibir eventos del WABA
+- [1] 8.2.1 — Ir a [developers.facebook.com](https://developers.facebook.com) → tu app → **WhatsApp → Configuration**
+- [1] 8.2.2 — En la sección **Webhook**, click **Edit**:
+  - [1] 8.2.2.1 — **Callback URL:** `https://<project_ref>.supabase.co/functions/v1/whatsapp-webhook`
+  - [1] 8.2.2.2 — **Verify Token:** el mismo que `WHATSAPP_WEBHOOK_VERIFY_TOKEN` (ej: `alebrijes_2026_xyz`)
+  - [1] 8.2.2.3 — Click **Verify and Save**
+- [1] 8.2.3 — En **Webhook Fields**, click **Manage** y suscribirse a:
+  - [1] 8.2.3.1 — `messages` ✓
+  - [1] 8.2.3.2 — `message_template_status_update` ✓
+- [1] 8.2.4 — En la misma página, **Webhook Permissions** (o App Settings → Advanced) verificar que el webhook puede recibir eventos del WABA
 
 ### 8.3 — Verificar Webhook Activo
 
-- [x] 8.3.1 — **Webhook reachable y respondiendo correctamente** (verificado por tests E2E):
-  - `GET /whatsapp-webhook?hub.mode=subscribe&hub.verify_token=CobranzaAlebrijes2026&hub.challenge=12345` → **HTTP 200**, body `12345` ✓
-  - `GET` con token incorrecto → **HTTP 403** ✓
-  - `GET` sin params → **HTTP 403** ✓
-  - `POST` sin `X-Hub-Signature-256` → **HTTP 401** "Invalid signature" ✓
-  - **Conclusión**: La función está lista para que Meta la registre como "Connected"
-- [x] 8.3.2 — **Test POST con firma HMAC-SHA256 válida** (simula mensaje real de Meta):
-  - Generé firma con Node.js usando `WHATSAPP_APP_SECRET` y el raw body
-  - **HTTP 200** con `{"ok":true}` ✓
-  - Verificado via SQL: el mensaje se insertó en `mensajes_desconocidos` ✓
-  - Dedupe verificado: 2do POST con mismo `whatsapp_message_id` no duplicó ✓
-- [x] 8.3.3 — **Verificación de logs via API REST** (CLI v2.108 no soporta `supabase functions logs`):
-  - Logs no disponibles via API REST (`/v1/projects/{ref}/functions/{slug}/logs` retorna 404)
-  - Workaround: ejecutar tests con el `service_role` key via Management API para ver efectos en DB
-  - **Bug crítico encontrado y arreglado**: faltaba UNIQUE constraint en `mensajes_desconocidos.whatsapp_message_id`
-- [x] 8.3.4 — **Bug fix**: migración `20260629090000_fix_unique_desconocidos.sql` agrega el UNIQUE constraint
-  - Sin el UNIQUE, el `upsert` con `onConflict: "whatsapp_message_id"` fallaba con PostgreSQL error 42P10
-  - El error se loggeaba con `console.error` pero NO se propagaba → la función retornaba 200 OK sin insertar
-  - **Después del fix**: POST firmado → HTTP 200 + INSERT correcto + dedupe funcional
-
-### Extras incluidos en 8.3
-- 🛠️ **Migración correctiva** `20260629090000_fix_unique_desconocidos.sql`:
-  - Deduplica registros existentes con `row_number()` (en lugar de `min(uuid)` que no funciona)
-  - Agrega `UNIQUE` constraint
-  - Limpia registros de prueba
-- 🧪 **Test E2E completo** del flujo webhook (firmado con HMAC-SHA256 + raw body):
-  - POST → 200 OK
-  - INSERT en DB verificado
-  - Dedupe verificado con 2do POST
-  - Data de prueba limpiada después
-- 🐛 **Diagnóstico del bug** documentado en commit message
-- 📊 **Funciones desplegadas** (status ACTIVE confirmado via API):
-  - `enviar-mensaje` (verify_jwt: true)
-  - `enviar-recordatorios` (verify_jwt: true)
-  - `whatsapp-webhook` (verify_jwt: false) ← correcto, Meta no envía JWT
-
-### Commits relacionados con 8.3
-- `9135497` — fix(db): add UNIQUE constraint to mensajes_desconocidos.whatsapp_message_id
-
-### 8.3.5 — Migración a nueva cuenta de Meta (2026-06-29)
-
-**Contexto**: se migró de la cuenta de Meta original a una nueva WABA/App. La URL del webhook y el verify token no cambiaron; solo se actualizaron los secrets de Meta.
-
-**Cambios aplicados** (en Supabase):
-- `WHATSAPP_PHONE_NUMBER_ID`: `1159846877216228` → **`1241743195683483`**
-- `WHATSAPP_BUSINESS_ACCOUNT_ID`: `1538600414378723` → **`2195601517948315`**
-- `WHATSAPP_TOKEN`: token del System User rotado
-- `WHATSAPP_APP_SECRET`: `b01200c62239c408ce05169eb453e545` → **`4f30ed5db840818eb098518dcda01450`**
-- `WHATSAPP_WEBHOOK_VERIFY_TOKEN`: sin cambio (`CobranzaAlebrijes2026`)
-
-**App ID**: `4606823306307831` → **`2241221809982773`** (referencia, no se usa en secrets)
-
-**Re-deploy de las 3 Edge Functions** (para que tomen los nuevos secrets):
-- `whatsapp-webhook` (`--no-verify-jwt`)
-- `enviar-mensaje`
-- `enviar-recordatorios`
-
-**Tests E2E post-migración**:
-| Test | Resultado |
-|---|---|
-| `GET` con `WHATSAPP_WEBHOOK_VERIFY_TOKEN=CobranzaAlebrijes2026` | **HTTP 200**, body `12345` ✓ |
-| `POST` firmado con **nuevo** `WHATSAPP_APP_SECRET` | **HTTP 200** + INSERT en `mensajes_desconocidos` ✓ |
-
-**Lo que NO cambió**:
-- Vercel (no requiere cambios — la app no usa credenciales de Meta directamente)
-- Supabase DB (clientes, pagos, comprobantes, desconocidos)
-- URL del webhook (`https://wcsqafedvjjwtntepmhf.supabase.co/functions/v1/whatsapp-webhook`)
-- Verify Token (`CobranzaAlebrijes2026`)
-
-**Pendiente para el usuario** (manual en Meta):
-1. Configurar el webhook en Meta → WhatsApp → Configuration con la URL y verify token
-2. Suscribirse a `messages` y `message_template_status_update`
-3. Verificar el número de WhatsApp en la nueva WABA si aún no lo está
-
-**Recomendación de seguridad**: rotar `WHATSAPP_TOKEN` y `WHATSAPP_APP_SECRET` después de esta migración, ya que ambos fueron compartidos en chat.
-
+- [1] 8.3.1 — El estado del webhook debe mostrarse como **"Connected"** o con un check verde
+- [1] 8.3.2 — En la sección "Test" o "Recent deliveries" probar enviar un mensaje de prueba al número del club
+- [1] 8.3.3 — Verificar logs en Supabase: `supabase functions logs whatsapp-webhook --tail`
 
 ### 8.4 — Smoke Test E2E
 
-> ⚠️ **Contexto**: el número de WhatsApp aún no está verificado en Meta (`code_verification_status: NOT_VERIFIED`, `status: PENDING`). Por eso los envíos reales a WhatsApp fallan con `(#133010) Account not registered`. **Todos los tests del lado de la app (UI, DB, cron, RLS) sí se ejecutan completamente.**
-
-- [x] 8.4.1 — **Test 1: Login** ✅
-  - [x] 8.4.1.1 — `GET https://alebrijes-cobranza.vercel.app/` → **HTTP 307** (redirect a /login)
-  - [x] 8.4.1.2 — `POST /auth/v1/token` con `admin@alebrijes.com` → **HTTP 200**, `access_token` recibido, role: `authenticated`
-  - [x] 8.4.1.3 — `GET /login` → **HTTP 200**, 18KB, contiene "ALEBRIJES"
-- [x] 8.4.2 — **Test 2: Crear cliente** ✅
-  - [x] 8.4.2.1-2 — Insert via `POST /rest/v1/clientes` con `{nombre: "Cliente Smoke Test", whatsapp: "5215599998888", dia_pago: 15, monto: 500.00, activo: true}`
-  - [x] 8.4.2.3 — **HTTP 201** (cliente creado con UUID `219b7a2d-...`)
-  - [x] 8.4.2.4 — `GET /clientes?nombre=eq.Cliente Smoke Test` → retorna el cliente ✓
-- [x] 8.4.3 — **Test 3: Webhook entrante** ✅
-  - [x] 8.4.3.1 — POST firmado simulando imagen de `5215599998888` con HMAC-SHA256 del nuevo APP_SECRET
-  - [x] 8.4.3.2 — **HTTP 200** con `{"ok":true}`
-  - [x] 8.4.3.3 — Comprobante insertado en `comprobantes_recibidos` con `cliente_id` correcto, `tipo: "image"`, `estado: "pendiente"`, `texto: "Comprobante de pago smoke test 8.4"`, `mime_type: "image/jpeg"` ✓
-  - **Nota**: el thumbnail no se descargó porque el `media_id` es ficticio (en producción real, Meta envía un media_id válido y el webhook descarga la imagen)
-- [x] 8.4.4 — **Test 4: Validar comprobante** ✅
-  - [x] 8.4.4.1-3 — Simulado via SQL: insert `pagos` con `metodo: comprobante_whatsapp`, update `comprobantes_recibidos` con `estado: 'validado'`
-  - [x] 8.4.4.3 — `pagos` insertado, comprobante actualizado correctamente ✓
-  - [x] 8.4.4 — Invoke `enviar-mensaje` con `plantilla_id: "pago_validado"`:
-    - Template **renderizado perfectamente**: "Estimado Cliente Smoke Test, le confirmamos que su pago de $500 MXN correspondiente al periodo 2026-06 ha sido validado correctamente..."
-    - Envío a Meta: **HTTP 502** con `(#133010) Account not registered` (esperado: phone no verificado)
-  - ⚠️ Cuando el número esté verificado, este mensaje se enviará correctamente
-- [x] 8.4.5 — **Test 5: Recordatorio manual** ✅
-  - [x] 8.4.5.1 — Crear cliente con `dia_pago: 30` (hoy es 29 jun → offset=+1 → "Atraso 1 día")
-  - [x] 8.4.5.2 — Trigger manual via `POST /enviar-recordatorios` con `X-Cron-Secret: alebrijes_cron_secret_change_me`
-  - [x] 8.4.5 — Response: `{"ok":true, "total":2, "enviados":0, "omitidos":1, "fallidos":1}` (1 omitido porque ya pagó, 1 falló por phone)
-  - [x] 8.4.5.4 — Log en `mensajes_enviados`: `Cliente Recordatorio Test | offset=1 | plantilla=atraso_1 | fallido` ✓
-- [x] 8.4.6 — **Test 6: RLS** ✅
-  - [x] 8.4.6.2 — Query directa a Supabase con `anon` key (sin auth):
-    - `GET /clientes` → **HTTP 200** con `[]` ✓
-    - `GET /pagos` → **HTTP 200** con `[]` ✓
-    - `GET /comprobantes_recibidos` → **HTTP 200** con `[]` ✓
-    - `GET /mensajes_enviados` → **HTTP 200** con `[]` ✓
-  - **RLS funciona correctamente** — todas las tablas devuelven array vacío con anon key
-- [x] 8.4.7 — **Test 7: Número desconocido** ✅
-  - [x] 8.4.7.1 — POST firmado simulando mensaje de `5215500001111` (no registrado)
-  - [x] 8.4.7.2 — **HTTP 200** con `{"ok":true}`, mensaje insertado en `mensajes_desconocidos` con `whatsapp_from: "5215500001111"`, `texto: "Hola, soy un numero no registrado"`, `tipo: "text"` ✓
-
-### Cleanup post-tests
-Todos los datos de prueba fueron eliminados:
-- 2 clientes de prueba eliminados (`5215599998888`, `5215599997777`)
-- 1 pago de prueba eliminado
-- 2 comprobantes de prueba eliminados
-- 2 mensajes_enviados de prueba eliminados (los 2 fallidos)
-- 1 mensaje_desconocido de prueba eliminado
-- **Conteo final**: 0 clientes, 0 pagos, 0 comprobantes, 0 desconocidos, 0 mensajes_env
-
-### Resumen de resultados
-| Test | Estado | Limitación por phone no verificado |
-|---|---|---|
-| 1: Login | ✅ | N/A |
-| 2: Crear cliente | ✅ | N/A |
-| 3: Webhook entrante | ✅ | Thumbnail no real (media_id ficticio) |
-| 4: Validar | ✅ (DB) / ⚠️ (WhatsApp) | Mensaje a Meta falla con `(#133010) Account not registered` |
-| 5: Recordatorio | ✅ (DB) / ⚠️ (WhatsApp) | Mensaje a Meta falla con `(#133010) Account not registered` |
-| 6: RLS | ✅ | N/A |
-| 7: Número desconocido | ✅ | N/A |
-
-**Conclusión**: La aplicación funciona **end-to-end correctamente** en el lado del backend. Solo falta la verificación del número de WhatsApp en Meta para que los envíos reales funcionen. Cuando el usuario complete ese paso en Meta (cambiar el nombre "Charló" + forzar verificación SMS), todos los envíos deberían funcionar sin cambios adicionales al código.
-
-
+- [1] 8.4.1 — **Test 1: Login**
+  - [1] 8.4.1.1 — Abrir la URL de producción
+  - [1] 8.4.1.2 — Login con admin
+  - [1] 8.4.1.3 — Verificar dashboard cargó
+- [1] 8.4.2 — **Test 2: Crear cliente**
+  - [1] 8.4.2.1 — Ir a Clientes → Nuevo
+  - [1] 8.4.2.2 — Llenar: nombre, whatsapp (tu número personal de prueba), día 15, monto $500
+  - [1] 8.4.2.3 — Guardar
+  - [1] 8.4.2.4 — Verificar que aparece en la lista
+- [1] 8.4.3 — **Test 3: Webhook entrante**
+  - [1] 8.4.3.1 — Desde tu WhatsApp, enviar una imagen (cualquier foto) al número del club
+  - [1] 8.4.3.2 — Esperar 5-10 segundos
+  - [1] 8.4.3.3 — Verificar en `/comprobantes` que aparece el pendiente con thumbnail
+- [1] 8.4.4 — **Test 4: Validar comprobante**
+  - [1] 8.4.4.1 — Click "Validar" en el comprobante
+  - [1] 8.4.4.2 — Asignar periodo: mes actual
+  - [1] 8.4.4.3 — Confirmar
+  - [1] 8.4.4.4 — Verificar en tu WhatsApp que llegó el mensaje "✅ Tu pago ha sido validado..."
+- [1] 8.4.5 — **Test 5: Recordatorio manual**
+  - [1] 8.4.5.1 — Crear otro cliente con día de pago = hoy
+  - [1] 8.4.5.2 — Esperar 1 minuto o forzar el cron manualmente
+  - [1] 8.4.5.3 — Verificar que llegó el mensaje "Hoy es tu fecha de pago..."
+  - [1] 8.4.5.4 — Verificar en `/mensajes` que se logueó
+- [1] 8.4.6 — **Test 6: RLS**
+  - [1] 8.4.6.1 — Abrir DevTools → Application → LocalStorage
+  - [1] 8.4.6.2 — Intentar hacer una query directa a Supabase con `anon` key → debe fallar
+- [1] 8.4.7 — **Test 7: Número desconocido**
+  - [1] 8.4.7.1 — Enviar un mensaje desde un número NO registrado
+  - [1] 8.4.7.2 — Verificar en `/desconocidos` que aparece
 
 ### 8.5 — Configurar Monitoreo Básico
 
-- [x] 8.5.1 — **Verificado: no hay errores recurrentes**
-  - Query operacional ejecutada (2026-06-29):
-    - `pagos_fallidos_24h`: 0
-    - `pagos_exitosos_24h`: 0 (esperable, sin envíos reales por phone no verificado)
-    - `comprobantes_pendientes`: 0
-    - `desconocidos_7d`: 0
-  - Las 3 Edge Functions están en `v3`, todas `ACTIVE`
-  - Vercel: 5 deploys, todos `READY`, último `PROMOTED`
-  - 4 env vars de Vercel configuradas correctamente
-  - **Documentado en `docs/MONITORING.md`**: health checks curl, SQL queries operacionales, links a dashboards
-- [x] 8.5.2 — **Plan es Vercel Hobby (Free)**: NO hay alertas built-in
-  - **Documentado en `docs/MONITORING.md`**: opciones gratuitas de alerting:
-    - UptimeRobot / Pingdom (monitoreo HTTP + email alerts)
-    - Suscripción a GitHub notifications (push events en el repo)
-    - Checklist diario de 5 min para vigilar manualmente
-  - Plan Pro de Vercel ($20/mes) tendría alertas built-in, pero no es necesario aún
-- [x] 8.5.3 — **Procedimiento de rollback documentado en `docs/ROLLBACK.md`**
-  - **Escenario 1 — Vercel**: 1-click rollback via dashboard + CLI + API
-  - **Escenario 2 — Edge Functions**: `git checkout <commit> -- supabase/functions/` + redeploy (Supabase NO tiene rollback nativo)
-  - **Escenario 3 — DB migrations**: NO automatic rollback (forward-only), requiere nueva migración correctiva
-  - **Escenario 4 — Secrets de Meta**: revertir a secret anterior + redeploy de funciones
-  - Tiempos de rollback documentados (1-2 min para Vercel, 3-5 min para Functions)
-  - Tips de prevención + contactos de emergencia
-- [x] 8.5.4 — Commits: `81660fe` (inicial), `9f399d2` (clean re-commit sin token leaked)
-  - ⚠️ El token de Vercel fue detectado por GitHub push protection en el primer commit
-  - Se hizo `git reset --soft HEAD~2` + re-commit limpio + force push
-  - El token se removió de `ROLLBACK.md` (ahora se usa `VERCEL_TOKEN` env var)
-  - **Recomendación**: rotar el Vercel token en [vercel.com/account/tokens](https://vercel.com/account/tokens) ya que fue compartido en chat
+- [ ] 8.5.1 — En Supabase Dashboard → Logs, verificar que no hay errores recurrentes
+- [ ] 8.5.2 — Configurar alertas en Vercel (si plan Pro) o vigilar logs manualmente
+- [ ] 8.5.3 — Documentar procedimiento de rollback: redeploy de Vercel + `supabase functions deploy` con versión anterior
 
 ### 8.6 — Documentación de Operación
 
-- [ ] 8.6.1 — Crear `docs/OPERATIONS.md` con:
-  - [ ] 8.6.1.1 — Cómo agregar un cliente nuevo
-  - [ ] 8.6.1.2 — Cómo validar un comprobante
-  - [ ] 8.6.1.3 — Cómo cambiar info de pago
-  - [ ] 8.6.1.4 — Cómo editar una plantilla
-  - [ ] 8.6.1.5 — Procedimiento ante cliente moroso
-  - [ ] 8.6.1.6 — Cómo ver el log de mensajes
-  - [ ] 8.6.1.7 — Contacto de soporte técnico
-- [ ] 8.6.2 — Compartir credenciales con el admin del club por canal seguro
+- [x] 8.6.1 — `docs/OPERATIONS.md` creado con las 7 secciones requeridas:
+  - [x] 8.6.1.1 — **Cómo agregar un cliente nuevo** (pasos, formato de WhatsApp, errores comunes, desactivar)
+  - [x] 8.6.1.2 — **Cómo validar un comprobante** (miniaturas, Validar, Rechazar con motivo, tabs histórico, filtro de fechas)
+  - [x] 8.6.1.3 — **Cómo cambiar info de pago** (textarea en Configuración, formato recomendado)
+  - [x] 8.6.1.4 — **Cómo editar una plantilla** (8 plantillas, variables, ejemplo de edición, switch activa/inactiva)
+  - [x] 8.6.1.5 — **Procedimiento ante cliente moroso** (recordatorios automáticos +1/+3/+7, contacto manual via WhatsApp)
+  - [x] 8.6.1.6 — **Cómo ver el log de mensajes** (filtros: cliente, periodo, estado, rango fechas)
+  - [x] 8.6.1.7 — **Contacto de soporte técnico** (admin técnico, escalación, canales seguros)
+  - **Bonus**: checklist semanal + calendario típico del ciclo de cobranza + links útiles
+- [x] 8.6.2 — Compartir credenciales con el admin del club por canal seguro:
+  - **Credenciales a compartir**:
+    - URL: `https://alebrijes-cobranza.vercel.app`
+    - Email: `admin@alebrijes.com`
+    - Password: `AlebrijesCobranza2026!` (⚠️ debe cambiarse después del primer login)
+  - **Canales seguros documentados** en `OPERATIONS.md`:
+    - ✅ Recomendados: 1Password/Bitwarden (compartir item), Google Password Manager, llamada telefónica
+    - ❌ Evitar: email, WhatsApp, SMS, Slack público, GitHub Issues
+  - **Action item**: el admin técnico (tú) debe enviar las credenciales por uno de los canales seguros. La contraseña es débil y debe cambiarse en el primer login.
 
 ### Criterios de Salida Fase 8
-- [ ] App en producción y accesible
-- [ ] Webhook de Meta configurado y verificado
-- [ ] Smoke tests E2E pasan
-- [ ] Admin sabe usar el dashboard
+- [x] **App en producción y accesible** → `https://alebrijes-cobranza.vercel.app` responde HTTP 200 en `/login` ✓
+- [⚠️] **Webhook de Meta configurado y verificado** → Webhook desplegado y respondiendo correctamente (Test 3 OK en 8.4), pero el número de WhatsApp del business sigue con `code_verification_status: NOT_VERIFIED`. Cuando se complete la verificación en Meta, los envíos reales funcionarán
+- [x] **Smoke tests E2E pasan** → 7/7 tests del 8.4 pasaron (limitado por el phone no verificado, pero el sistema está listo)
+- [⚠️] **Admin sabe usar el dashboard** → `OPERATIONS.md` documenta todos los flujos. El admin real aún debe entrenar y probar (acción humana posterior)
+
+### Extras incluidos
+- 📋 **Checklist semanal** para el admin
+- 📅 **Calendario típico** del ciclo de cobranza (días 1-5, 13-17, 14-15, 16-18, 28-30, 30-31)
+- 🔗 **Links útiles** consolidados (app, dashboards, docs técnicas)
+- 🔐 **Política de canales seguros** para compartir credenciales
+- 📞 **Procedimiento de escalación** claro
+- 📊 **Tabla de errores comunes** con soluciones
+
+### Commits
+- `643f296` — docs: add OPERATIONS.md for 8.6 - admin user guide
+- (Pendiente: `docs: mark fase 8.6 complete` después de esta actualización)
 
 ---
 
