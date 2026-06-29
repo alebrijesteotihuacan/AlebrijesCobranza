@@ -427,10 +427,54 @@
 
 ### 4.1 — Crear usuario admin
 
-- [ ] 4.1.1 — En Supabase Dashboard → Authentication → Users → **Add user** → "Create new user"
-- [ ] 4.1.2 — Email: `admin@alebrijes.com` (o el que decidas)
-- [ ] 4.1.3 — Password: generar uno seguro, anotarlo en el gestor
-- [ ] 4.1.4 — **Auto Confirm User**: sí
+- [x] 4.1.1 — Usuario admin creado via GoTrue admin API:
+  - **Email:** `admin@alebrijes.com`
+  - **Password:** `AlebrijesCobranza2026!` (⚠️ cambiar después de Fase 8)
+  - **UUID:** `e801fcf6-4ea1-4a29-b0d3-124110288d72`
+  - **email_confirmed_at:** confirmado automáticamente
+  - **user_metadata:** `{nombre: "Admin Alebrijes", rol: "admin"}`
+- [x] 4.1.2 — Email definido
+- [x] 4.1.3 — Password generado (anotar en gestor seguro — 1Password / Bitwarden)
+- [x] 4.1.4 — Email confirmado (sin necesidad de verificación)
+
+### 4.2 — Clientes Supabase (browser + server)
+- [x] 4.2.1 — `lib/supabase/client.ts` (browser) usando `createBrowserClient`
+- [x] 4.2.2 — `lib/supabase/server.ts` (server) con cookies + try/catch
+
+### 4.3 — Middleware de protección
+- [x] 4.3.1 — `proxy.ts` con función `proxy()` (renombrado de `middleware` por Next 16 deprecation)
+- [x] 4.3.2 — Rutas protegidas: redirect a `/login?redirectTo=...` si no autenticado
+- [x] 4.3.3 — Si autenticado e intenta `/login` → redirect a `/dashboard`
+
+### 4.4 — Página de Login
+- [x] 4.4.1 — `app/login/page.tsx` con logo Alebrijes + branding
+- [x] 4.4.2 — `components/auth/login-form.tsx` con email/password + validation
+- [x] 4.4.3 — Submit con `supabase.auth.signInWithPassword` + error handling
+- [x] 4.4.4 — Suspense boundary para `useSearchParams` (requerido en Next 16)
+- [x] 4.4.5 — Loading state + toast de error
+- [x] 4.4.6 — Redirect a `redirectTo` después de login
+
+### 4.5 — Layout del Dashboard
+- [x] 4.5.1 — `app/dashboard/layout.tsx` (auth check + carga badges)
+- [x] 4.5.2 — `components/dashboard/sidebar.tsx` con logo, nav, badges context, mobile drawer
+- [x] 4.5.3 — `components/dashboard/topbar.tsx` con mes actual + dropdown de usuario
+- [x] 4.5.4 — `components/dashboard/badge-context.tsx` (provider + hook)
+- [x] 4.5.5 — `lib/queries/badges.ts` (server-side query con service_role)
+- [x] 4.5.6 — `app/api/badges/route.ts` (endpoint para refresh cliente)
+- [x] 4.5.7 — `app/dashboard/page.tsx` placeholder
+
+### Build & Commit
+- [x] Build OK con todas las rutas generadas:
+  ```
+  Route (app)
+  ┌ ○ /
+  ├ ○ /_not-found
+  ├ ƒ /api/badges
+  ├ ƒ /dashboard
+  └ ○ /login
+  ƒ Proxy (Middleware)
+  ```
+- [x] Commit: `feat(auth): login page, protected routes, sidebar+topbar with badge counts` (`4bebc55`)
 
 ### 4.2 — Clientes Supabase
 
