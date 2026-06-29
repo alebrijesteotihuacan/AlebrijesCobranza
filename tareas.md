@@ -362,29 +362,21 @@
 
 ### 3.4 — Configurar secretos y deploy
 
-- [ ] 3.4.1 — Setear todos los secretos en Supabase:
-  ```bash
-  supabase secrets set \
-    WHATSAPP_TOKEN=<token> \
-    WHATSAPP_PHONE_NUMBER_ID=<phone_id> \
-    WHATSAPP_BUSINESS_ACCOUNT_ID=<waba_id> \
-    WHATSAPP_APP_SECRET=<app_secret> \
-    WHATSAPP_WEBHOOK_VERIFY_TOKEN=alebrijes_2026_xyz \
-    SUPABASE_URL=https://<project_ref>.supabase.co \
-    SUPABASE_SERVICE_ROLE_KEY=<service_role>
-  ```
-- [ ] 3.4.2 — Verificar: `supabase secrets list`
-- [ ] 3.4.3 — Deploy de las 3 funciones:
-  ```bash
-  supabase functions deploy whatsapp-webhook --no-verify-jwt
-  supabase functions deploy enviar-mensaje
-  supabase functions deploy enviar-recordatorios
-  ```
-  - [ ] ⚠️ `--no-verify-jwt` solo en `whatsapp-webhook` porque Meta no envía JWT
-- [ ] 3.4.4 — Verificar URLs desplegadas:
-  - [ ] 3.4.4.1 — `https://<project_ref>.supabase.co/functions/v1/whatsapp-webhook`
-  - [ ] 3.4.4.2 — `https://<project_ref>.supabase.co/functions/v1/enviar-mensaje`
-  - [ ] 3.4.4.3 — `https://<project_ref>.supabase.co/functions/v1/enviar-recordatorios`
+- [x] 3.4.1 — Secretos seteados con `supabase secrets set` (sin `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` porque son auto-inyectados):
+  - `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_BUSINESS_ACCOUNT_ID`
+  - `WHATSAPP_APP_SECRET`, `WHATSAPP_WEBHOOK_VERIFY_TOKEN`
+  - `CRON_SECRET`, `NEXT_PUBLIC_PAYMENT_INFO`
+- [x] 3.4.2 — Verificado con `supabase secrets list` — 7 secrets activos
+- [x] 3.4.3 — Deploy de las 3 funciones:
+  - [x] `supabase functions deploy whatsapp-webhook --no-verify-jwt` ✅
+  - [x] `supabase functions deploy enviar-mensaje` ✅
+  - [x] `supabase functions deploy enviar-recordatorios` ✅
+  - ⚠️ **Bug fix durante deploy**: type complejo en `whatsapp-webhook` no era válido para el bundler de Deno — simplificado a `any` con `deno-lint-ignore`
+- [x] 3.4.4 — URLs verificadas via Management API:
+  - [x] `https://wcsqafedvjjwtntepmhf.supabase.co/functions/v1/whatsapp-webhook` — `verify_jwt: false`
+  - [x] `https://wcsqafedvjjwtntepmhf.supabase.co/functions/v1/enviar-mensaje` — `verify_jwt: true`
+  - [x] `https://wcsqafedvjjwtntepmhf.supabase.co/functions/v1/enviar-recordatorios` — `verify_jwt: true`
+- [x] 3.4.5 — Commits: `cac91c1` (bug fix)
 
 ### 3.5 — Test manual de Edge Functions
 
