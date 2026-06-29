@@ -198,6 +198,10 @@ export function ComprobanteCard({ comprobante: c, periodos, defaultPeriodo }: Pr
         clienteMonto={c.cliente?.monto ?? 0}
         periodos={periodos}
         defaultPeriodo={defaultPeriodo}
+        previewUrl={c.signedUrl}
+        previewTipo={c.tipo === "audio" || c.tipo === "video" ? "text" : c.tipo}
+        previewTexto={c.texto}
+        caption={c.texto}
       />
 
       <RechazarDialog
