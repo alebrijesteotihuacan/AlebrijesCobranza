@@ -605,13 +605,46 @@ Route (app)
 
 ### 5.3 — Editar cliente
 
-- [ ] 5.3.1 — `app/(app)/dashboard/clientes/[id]/page.tsx`
-- [ ] 5.3.2 — Server Component carga el cliente
-- [ ] 5.3.3 — Reutilizar `<ClienteForm />` con `defaultValues` del cliente
-- [ ] 5.3.4 — Server action `actualizarCliente(id, data)`
-- [ ] 5.3.5 — Mostrar sección "Historial de pagos" (lista de `pagos` del cliente)
-- [ ] 5.3.6 — Mostrar sección "Mensajes enviados" (lista de `mensajes_enviados`)
-- [ ] 5.3.7 — Commit: `feat(clientes): edit page with payment history`
+- [x] 5.3.1 — `app/dashboard/clientes/[id]/page.tsx` (Server Component, dynamic route, `params: Promise<{id}>` para Next 15+)
+- [x] 5.3.2 — Server Component carga el cliente via `getClienteById(id)` con service_role; si no existe → `notFound()`
+- [x] 5.3.3 — Reutiliza `<ClienteForm mode="edit" cliente={cliente} />` (mismo componente de Fase 5.2, con defaultValues del cliente)
+- [x] 5.3.4 — Server action `updateClienteAction` (existente en `lib/actions/clientes.ts`): valida con Zod, `update().eq(id)`, maneja 23505, revalida paths
+- [x] 5.3.5 — Sección "Historial de pagos":
+  - `components/clientes/historial-pagos.tsx`
+  - Lista de pagos via `getPagosByCliente(id, 50)`
+  - Total cobrado, formato MXN, periodo en español (capitalize), metodo badge, notas
+  - Dialog de confirmación para eliminar (reactivará recordatorios)
+  - Botón "Registrar pago" → abre `PagoFormDialog`
+- [x] 5.3.6 — Sección "Mensajes enviados":
+  - `components/clientes/mensajes-timeline.tsx`
+  - Timeline visual con dots verde/rojo según estado
+  - `getMensajesByCliente(id, 50)` con offset, periodo, estado, error
+  - Collapsible (cerrable para节省 espacio)
+  - Muestra error de Meta con toggle "Ver error"
+- [x] 5.3.7 — Commit: `feat(clientes): edit page with payment history and message timeline` (commit `1ebc214`)
+
+### Extras incluidos
+- 🎨 **Layout 2 columnas** en `lg+` para historial + mensajes; 1 columna en mobile
+- 🔔 **Badge "Inactivo"** prominente en la parte superior si el cliente está desactivado
+- 📋 **`PagoFormDialog`** completo con periodo/monto/método/notas (Zod-validated, server action)
+- 🔁 **Acciones con revalidación**: deletePagoAction revalida 3 paths (cliente, lista, dashboard)
+- 📜 **Mensajes de error de Meta** visibles con toggle (no saturan la UI)
+- 🛠️ **Helper `formatPeriodoLabel`** en `lib/utils.ts`: convierte "2026-06" → "Junio 2026"
+- 🛠️ **Helper `formatRelativeTime`**: "Hace 2h", "Hace 3d", etc.
+
+### Build status
+```
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/badges
+├ ƒ /dashboard
+├ ƒ /dashboard/clientes
+├ ƒ /dashboard/clientes/[id]    ← NUEVA
+├ ƒ /dashboard/clientes/nuevo
+└ ○ /login
+ƒ Proxy (Middleware)
+```
 
 ### 5.4 — Marcar como pagado (sin comprobante)
 
