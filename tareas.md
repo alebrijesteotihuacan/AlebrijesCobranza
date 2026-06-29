@@ -1125,6 +1125,43 @@ Route (app)
 ### Commits relacionados con 8.3
 - `9135497` — fix(db): add UNIQUE constraint to mensajes_desconocidos.whatsapp_message_id
 
+### 8.3.5 — Migración a nueva cuenta de Meta (2026-06-29)
+
+**Contexto**: se migró de la cuenta de Meta original a una nueva WABA/App. La URL del webhook y el verify token no cambiaron; solo se actualizaron los secrets de Meta.
+
+**Cambios aplicados** (en Supabase):
+- `WHATSAPP_PHONE_NUMBER_ID`: `1159846877216228` → **`1241743195683483`**
+- `WHATSAPP_BUSINESS_ACCOUNT_ID`: `1538600414378723` → **`2195601517948315`**
+- `WHATSAPP_TOKEN`: token del System User rotado
+- `WHATSAPP_APP_SECRET`: `b01200c62239c408ce05169eb453e545` → **`4f30ed5db840818eb098518dcda01450`**
+- `WHATSAPP_WEBHOOK_VERIFY_TOKEN`: sin cambio (`CobranzaAlebrijes2026`)
+
+**App ID**: `4606823306307831` → **`2241221809982773`** (referencia, no se usa en secrets)
+
+**Re-deploy de las 3 Edge Functions** (para que tomen los nuevos secrets):
+- `whatsapp-webhook` (`--no-verify-jwt`)
+- `enviar-mensaje`
+- `enviar-recordatorios`
+
+**Tests E2E post-migración**:
+| Test | Resultado |
+|---|---|
+| `GET` con `WHATSAPP_WEBHOOK_VERIFY_TOKEN=CobranzaAlebrijes2026` | **HTTP 200**, body `12345` ✓ |
+| `POST` firmado con **nuevo** `WHATSAPP_APP_SECRET` | **HTTP 200** + INSERT en `mensajes_desconocidos` ✓ |
+
+**Lo que NO cambió**:
+- Vercel (no requiere cambios — la app no usa credenciales de Meta directamente)
+- Supabase DB (clientes, pagos, comprobantes, desconocidos)
+- URL del webhook (`https://wcsqafedvjjwtntepmhf.supabase.co/functions/v1/whatsapp-webhook`)
+- Verify Token (`CobranzaAlebrijes2026`)
+
+**Pendiente para el usuario** (manual en Meta):
+1. Configurar el webhook en Meta → WhatsApp → Configuration con la URL y verify token
+2. Suscribirse a `messages` y `message_template_status_update`
+3. Verificar el número de WhatsApp en la nueva WABA si aún no lo está
+
+**Recomendación de seguridad**: rotar `WHATSAPP_TOKEN` y `WHATSAPP_APP_SECRET` después de esta migración, ya que ambos fueron compartidos en chat.
+
 
 ### 8.4 — Smoke Test E2E
 
