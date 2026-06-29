@@ -688,17 +688,55 @@ Route (app)
 
 ### 6.1 — Dashboard principal
 
-- [ ] 6.1.1 — `app/(app)/dashboard/page.tsx` (Server Component)
-- [ ] 6.1.2 — Calcular KPIs del mes actual (en TZ México):
-  - [ ] 6.1.2.1 — **Cobrado**: `sum(monto) from pagos where periodo = mes_actual`
-  - [ ] 6.1.2.2 — **Pagos del mes**: `count(*) from pagos where periodo = mes_actual`
-  - [ ] 6.1.2.3 — **Morosos**: clientes activos SIN pago en `pagos` y con `dia_pago` ya pasado este mes
-  - [ ] 6.1.2.4 — **Pendientes**: `count(*) from comprobantes_recibidos where estado='pendiente'`
-  - [ ] 6.1.2.5 — **Por vencer**: clientes con `dia_pago` en próximos 3 días sin pago
-- [ ] 6.1.3 — Crear `components/dashboard/kpi-card.tsx` (reutilizable)
-- [ ] 6.1.4 — Grid de 4-5 KPI cards en el top
-- [ ] 6.1.5 — Tabla "Clientes recientes" debajo (últimos 5 modificados)
-- [ ] 6.1.6 — Commit: `feat(dashboard): kpi cards and recent clients`
+- [x] 6.1.1 — `app/dashboard/page.tsx` (Server Component, dynamic)
+- [x] 6.1.2 — KPIs calculados en `lib/queries/dashboard.ts:getDashboardKpis()` con TZ `America/Mexico_City`:
+  - [x] 6.1.2.1 — **Cobrado**: `sum(monto) from pagos where periodo = current YYYY-MM`
+  - [x] 6.1.2.2 — **Pagos del mes**: `count(*) from pagos where periodo = current YYYY-MM`
+  - [x] 6.1.2.3 — **Morosos**: clientes activos SIN pago + `dia_pago` ya pasado este mes (clamp para meses con <30 días)
+  - [x] 6.1.2.4 — **Pendientes**: `count(*) from comprobantes_recibidos where estado='pendiente'`
+  - [x] 6.1.2.5 — **Por vencer**: clientes activos SIN pago + `dia_pago` en próximos 3 días (delta 0..3)
+- [x] 6.1.3 — `components/dashboard/kpi-card.tsx` con 6 tonos (`orange`, `success`, `warning`, `danger`, `info`, `neutral`), soporte para `emphasis` (tamaño grande) y `href` (clickable)
+- [x] 6.1.4 — Grid responsive de 5 KPI cards:
+  - 1 col mobile, 2 sm, 3 lg, 5 xl
+  - Cobrado (orange, emphasis) · Pagos (success) · Morosos (danger) · Por vencer (warning) · Comprobantes (info)
+- [x] 6.1.5 — Tabla "Clientes recientes" debajo (últimos 5 modificados) con:
+  - Columnas: Nombre, WhatsApp (sm+), Día, Monto, Actualizado (md+)
+  - Link al cliente + chevron
+  - Badge "Inactivo" si aplica
+- [x] 6.1.6 — Commit: `feat(dashboard): KPI cards, morosos/por vencer lists, recent clients table` (commit `77de5c6`)
+
+### Extras incluidos
+- 📊 **Dos listas laterales** (Morosos + Por vencer) con `getMorososList()` y `getPorVencerList()`
+- 🎨 **KpiCard design system**:
+  - Tonos semánticos (orange, success, warning, danger, info, neutral)
+  - Icono grande en card con fondo de color suave
+  - Hover lift effect cuando es clickeable
+  - Soporte para `emphasis` (Cobrado) y `trend`
+- 📱 **Responsive completo**:
+  - Header stack vertical en mobile, horizontal en sm+
+  - KPIs: 1/2/3/5 columnas según breakpoint
+  - Tabla con columnas ocultas en mobile (WhatsApp en sm-, Actualizado en md-)
+  - Tabla `overflow-x-auto` para mobile landscape
+- 🧮 **Cálculo correcto de fechas**:
+  - `diaPagoEnMes()` clamp a `lastDayOfMonth` (Feb=28/29, etc.)
+  - `morosos`: `today > diaDelPago`
+  - `porVencer`: `diaDelPago - today ∈ [0, 3]`
+- 🔗 **Cards clickeables** con `href` que llevan a páginas relevantes
+- 📈 **Cálculo de cobranza %**: `pagosCount / totalClientesActivos`
+
+### Build status
+```
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/badges
+├ ƒ /dashboard             ← MEJORADA
+├ ƒ /dashboard/clientes
+├ ƒ /dashboard/clientes/[id]
+├ ƒ /dashboard/clientes/nuevo
+└ ○ /login
+ƒ Proxy (Middleware)
+```
 
 ### 6.2 — Reportes
 
