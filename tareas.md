@@ -281,27 +281,27 @@
 
 ### 3.1 — Función `whatsapp-webhook`
 
-- [ ] 3.1.1 — Crear `supabase/functions/whatsapp-webhook/index.ts`
-- [ ] 3.1.2 — Implementar handler `GET` (verificación de Meta):
-  - [ ] 3.1.2.1 — Lee query params: `hub.mode`, `hub.verify_token`, `hub.challenge`
-  - [ ] 3.1.2.2 — Si mode=`subscribe` y token=correcto → retorna challenge con 200
-  - [ ] 3.1.2.3 — Si no → retorna 403
-- [ ] 3.1.3 — Implementar handler `POST` (mensajes entrantes):
-  - [ ] 3.1.3.1 — Validar firma `X-Hub-Signature-256` con `WHATSAPP_APP_SECRET` usando HMAC-SHA256
-  - [ ] 3.1.3.2 — Parsear `entry[].changes[].value.messages[]`
-  - [ ] 3.1.3.3 — Por cada mensaje: extraer `from`, `type`, `id`, `media_id`, `text/caption`
-  - [ ] 3.1.3.4 — Crear cliente Supabase con service_role
-  - [ ] 3.1.3.5 — Buscar cliente activo por `whatsapp` exacto
-  - [ ] 3.1.3.6 — Si `media_id` existe:
-    - [ ] 3.1.3.6.1 — GET a `https://graph.facebook.com/v19.0/{media_id}` con Bearer token para obtener URL
-    - [ ] 3.1.3.6.2 — GET a esa URL → binario
-    - [ ] 3.1.3.6.3 — Detectar extensión por mime_type
-    - [ ] 3.1.3.6.4 — `supabase.storage.from('comprobantes').upload(path, blob)`
-  - [ ] 3.1.3.7 — Si cliente existe → insert en `comprobantes_recibidos`
-  - [ ] 3.1.3.8 — Si cliente no existe → insert en `mensajes_desconocidos`
-  - [ ] 3.1.3.9 — Responder 200 OK rápido (Meta reintenta si >5s)
-- [ ] 3.1.4 — Manejo de errores con try/catch y log a console (visible con `supabase functions logs`)
-- [ ] 3.1.5 — Commit: `feat(functions): whatsapp webhook for incoming messages`
+- [x] 3.1.1 — Creado `supabase/functions/whatsapp-webhook/index.ts` (331 líneas, Deno)
+- [x] 3.1.2 — Handler `GET` (verificación de Meta):
+  - [x] 3.1.2.1 — Lee query params: `hub.mode`, `hub.verify_token`, `hub.challenge`
+  - [x] 3.1.2.2 — Si mode=`subscribe` y token coincide con `WHATSAPP_WEBHOOK_VERIFY_TOKEN` → retorna `hub.challenge` con 200
+  - [x] 3.1.2.3 — Si no → retorna 403 "Forbidden"
+- [x] 3.1.3 — Handler `POST` (mensajes entrantes):
+  - [x] 3.1.3.1 — Valida firma `X-Hub-Signature-256` con HMAC-SHA256 (`crypto.subtle` Web Crypto API, comparación safe-equal)
+  - [x] 3.1.3.2 — Parsea `entry[].changes[].value.messages[]` con validación de JSON
+  - [x] 3.1.3.3 — Por cada mensaje: extrae `from`, `type`, `id`, `media_id` (image/document/audio/video/sticker), `text.body` o `caption`
+  - [x] 3.1.3.4 — Cliente Supabase creado con `service_role` (bypass RLS)
+  - [x] 3.1.3.5 — Busca cliente activo por `whatsapp` exacto (`maybeSingle`)
+  - [x] 3.1.3.6 — Si `media_id` existe:
+    - [x] 3.1.3.6.1 — GET `https://graph.facebook.com/v19.0/{media_id}` con Bearer token → URL del media
+    - [x] 3.1.3.6.2 — GET a esa URL → binario (Blob)
+    - [x] 3.1.3.6.3 — Detecta extensión por `mime_type` (jpg, png, webp, pdf, mp4, m4a, ogg, bin)
+    - [x] 3.1.3.6.4 — `supabase.storage.from('comprobantes').upload(path, blob)` con path `comprobantes/{cliente|unknown}/{YYYY}/{MM}/{msgId}.{ext}`
+  - [x] 3.1.3.7 — Si cliente existe → `upsert` en `comprobantes_recibidos` con `onConflict: whatsapp_message_id` (dedupe)
+  - [x] 3.1.3.8 — Si cliente no existe → `upsert` en `mensajes_desconocidos`
+  - [x] 3.1.3.9 — Responde 200 OK con `{ok: true}` (rápido, sin esperar a Meta)
+- [x] 3.1.4 — Try/catch por mensaje; logs con `console.log/error/warn` (visibles con `supabase functions logs`)
+- [x] 3.1.5 — Commit: `feat(functions): whatsapp-webhook with GET verification and POST incoming messages` (commit `dd325de`)
 
 ### 3.2 — Función `enviar-mensaje`
 
