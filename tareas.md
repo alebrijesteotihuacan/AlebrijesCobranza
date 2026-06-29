@@ -866,13 +866,27 @@ Route (app)
 
 ### 7.3 — Acción Rechazar
 
-- [ ] 7.3.1 — Click en "Rechazar" → abre dialog con campo de motivo
-- [ ] 7.3.2 — Server action `rechazarComprobante(id, motivo)`:
-  - [ ] 7.3.2.1 — Update `comprobantes_recibidos` con estado='rechazado', notas_admin=motivo
-  - [ ] 7.3.2.2 — Borrar archivo de Storage
-  - [ ] 7.3.2.3 — Llamar a Edge Function `enviar-mensaje` con plantilla `pago_rechazado`
-  - [ ] 7.3.2.4 — Toast éxito
-- [ ] 7.3.3 — Commit: `feat(comprobantes): reject action with notification`
+- [x] 7.3.1 — Click en "Rechazar" → abre `<RechazarDialog />` con campo de motivo (Textarea, 4 rows, maxLength=500):
+  - Botón outline rojo en `ComprobanteCard`
+  - Dialog con título "Rechazar comprobante" + descripción
+  - Textarea con placeholder de ejemplos
+  - Counter "0/500" caracteres
+  - Estado de loading con `Loader2`
+- [x] 7.3.2 — Server action `rechazarComprobanteAction` (en `lib/actions/comprobantes.ts`):
+  - [x] 7.3.2.1 — `update` `comprobantes_recibidos` con `estado='rechazado'`, `notas_admin=motivo` (truncado a 500 chars), `validado_at`, `validado_por=null`
+  - [x] 7.3.2.2 — `storage.remove([storage_path])` con `.catch(() => {})` (non-fatal)
+  - [x] 7.3.2.3 — `fetch` a `enviar-mensaje` con plantilla `pago_rechazado` y `offset_dias=998`
+  - [x] 7.3.2.4 — `toast.success("Comprobante de {nombre} rechazado")` + warning si WhatsApp falló
+  - **Plus**: validación de estado (rechaza si ya procesado) + revalidatePath en 3 paths
+- [x] 7.3.3 — Commit: (incluido en `feat(comprobantes): inbox with thumbnails, validar/rechazar dialogs, signed URLs` commit `75dd955`)
+
+### Extras incluidos
+- 🛡️ **Validación de motivo vacío**: server action retorna error si motivo.trim() === ""
+- 🛡️ **Validación de estado**: rechaza si el comprobante ya fue procesado
+- 🛡️ **Non-fatal**: Storage delete y WhatsApp no bloquean el rechazo
+- 📱 **Counter en tiempo real**: "X/500" caracteres
+- 🎨 **Icono XCircle** en rojo Alebrijes para el dialog
+- 🎯 **Botón con color destructivo**: `bg-alebrijes-red hover:bg-alebrijes-red/90`
 
 ### 7.4 — Vista de validados/rechazados
 
