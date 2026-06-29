@@ -839,21 +839,30 @@ Route (app)
 
 ### 7.2 — Acción Validar
 
-- [ ] 7.2.1 — Click en "Validar" → abre `<ValidarDialog />`
-- [ ] 7.2.2 — Dialog contiene:
-  - [ ] 7.2.2.1 — Preview del comprobante
-  - [ ] 7.2.2.2 — Selector de periodo (default: mes actual)
-  - [ ] 7.2.2.3 — Notas opcionales
-  - [ ] 7.2.2.4 — Botones "Cancelar" / "Validar"
-- [ ] 7.2.3 — Server action `validarComprobante(id, periodo, notas)`:
-  - [ ] 7.2.3.1 — Iniciar transacción (o secuencia de operaciones):
-    - [ ] 7.2.3.1.1 — Insert en `pagos`
-    - [ ] 7.2.3.1.2 — Update `comprobantes_recibidos` con estado='validado'
-    - [ ] 7.2.3.1.3 — Borrar archivo de Storage
-  - [ ] 7.2.3.2 — Llamar a Edge Function `enviar-mensaje` con plantilla `pago_validado`
-  - [ ] 7.2.3.3 — Toast éxito
-  - [ ] 7.2.3.4 — `revalidatePath('/dashboard/comprobantes')`
-- [ ] 7.2.4 — Commit: `feat(comprobantes): validate action with confirmation`
+- [x] 7.2.1 — Click en "Validar" → abre `<ValidarDialog />` (en `comprobante-card.tsx`)
+- [x] 7.2.2 — Dialog contiene:
+  - [x] 7.2.2.1 — **Preview del comprobante** (mini-thumbnail + caption + "Ver completo" con signed URL) — agregado en este commit
+  - [x] 7.2.2.2 — Selector de periodo (default: mes actual via `getCurrentPeriodo()`)
+  - [x] 7.2.2.3 — Notas opcionales (max 500 chars)
+  - [x] 7.2.2.4 — Botones "Cancelar" / "Confirmar validación" (verde Alebrijes)
+- [x] 7.2.3 — Server action `validarComprobanteAction` (en `lib/actions/comprobantes.ts`):
+  - [x] 7.2.3.1 — Secuencia de operaciones (no transacción DB literal, pero idempotente):
+    - [x] 7.2.3.1.1 — `upsert` en `pagos` con `onConflict: cliente_id,periodo` (idempotente)
+    - [x] 7.2.3.1.2 — `update` `comprobantes_recibidos` con `estado='validado'`, `periodo_asignado`, `validado_at`
+    - [x] 7.2.3.1.3 — `remove` archivo de Storage `comprobantes` (non-fatal si falla)
+  - [x] 7.2.3.2 — `fetch` a `enviar-mensaje` Edge Function con plantilla `pago_validado` + `offset_dias=999`
+  - [x] 7.2.3.3 — Toast de éxito con nombre del cliente; toast warning si WhatsApp falló
+  - [x] 7.2.3.4 — `revalidatePath` en 4 paths: `/comprobantes`, `/dashboard`, `/reportes`, `/clientes/[id]`
+- [x] 7.2.4 — Commit: `feat(comprobantes): add inline comprobante preview to ValidarDialog` (commit `ca157f2`)
+
+### Extras incluidos
+- 🛡️ **Idempotencia** via `upsert` en `pagos` (re-ejecución no causa duplicados)
+- 🛡️ **Validación de estado**: si el comprobante ya fue validado/rechazado, la action rechaza
+- 🛡️ **Non-fatal Storage delete**: si falla, el comprobante igual se marca como validado
+- 🛡️ **Non-fatal WhatsApp**: si falla, el pago se registra igual y se reporta via `result.error`
+- 🖼️ **Mini preview en el dialog**: thumbnail 24x24 (image) o icono (document/text) + caption + link "Ver completo"
+- 📱 **Responsive**: preview en row horizontal, se adapta a mobile
+- 🔄 **`max-h-[90vh] overflow-y-auto`**: dialog scrollable para pantallas pequeñas
 
 ### 7.3 — Acción Rechazar
 
