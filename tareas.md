@@ -1185,11 +1185,27 @@ Route (app)
 
 ### Items pendientes para próximas sesiones 🕐
 
-- [ ] 9.1 — **Loading states** con skeletons de shadcn en todas las páginas (10+ páginas)
-- [ ] 9.7 — **Búsqueda global** en el topbar (clientes, mensajes, comprobantes)
+- [x] 9.1 — **Loading states** con skeletons de shadcn en todas las páginas (commit `202c97a`)
+  - `components/ui/skeleton.tsx` (faltaba en shadcn base-nova)
+  - 9 `loading.tsx` files para todas las rutas del dashboard
+  - Skeletons coinciden con la estructura de cada página
+- [x] 9.7 — **Búsqueda global** en el topbar (commit `fe1c9b6`)
+  - `app/api/search/route.ts`: GET con auth, busca en clientes/comprobantes/desconocidos
+  - `components/global-search.tsx`: Dialog modal con `⌘K` shortcut, debounced 200ms, keyboard nav
+  - 5 resultados por categoría con badge de tipo
+- [x] 9.9 — **Auditoría**: tabla `audit_log` con triggers (commit `a566e52`)
+  - Migración `20260629200000_audit_log.sql`: tabla + RLS + `write_audit_log()` RPC
+  - `lib/audit.ts`: helper non-fatal para escribir desde server actions
+  - `lib/queries/audit.ts`: getAuditLog() + getAuditKpis() con paginación
+  - `lib/actions/clientes.ts`: audit() integrado en create/update/soft_delete/reactivate
+  - `app/dashboard/admin/auditoria/page.tsx`: viewer completo con KPIs + tabla color-coded
+- [x] 9.10 — **Multi-admin**: UI para invitar/desactivar admins (commit `b2974c0`)
+  - `lib/queries/admin.ts`: listAdmins() via GoTrue admin API (service_role)
+  - `lib/actions/admin.ts`: inviteAdminAction, banAdminAction, unbanAdminAction
+  - `components/admin/invite-admin-form.tsx` + `admin-list.tsx`
+  - `app/dashboard/admin/page.tsx`: combina invite + list
+  - Enlazado desde `configuracion/page.tsx` con botón "Gestionar administradores"
 - [ ] 9.8 — **Notificaciones en el navegador** (Web Push API) — requiere service worker + VAPID
-- [ ] 9.9 — **Auditoría**: tabla `audit_log` con triggers
-- [ ] 9.10 — **Multi-admin**: UI para invitar/desactivar admins
 - [ ] 9.12 — **Tests automatizados** (Vitest + Playwright) — gran esfuerzo
 - [ ] 9.13 — **CI/CD** con GitHub Actions
 - [ ] 9.14 — **Internacionalización** (i18n) — gran esfuerzo
