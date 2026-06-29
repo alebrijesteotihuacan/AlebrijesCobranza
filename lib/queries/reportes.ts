@@ -205,3 +205,65 @@ function csvEscape(v: string): string {
   }
   return v;
 }
+
+export interface PagoMensual {
+  periodo: string;
+  dia15: number;
+  dia30: number;
+  total: number;
+  pagosCount: number;
+}
+
+/**
+ * Returns the last `months` months of payments grouped by dia_pago (15 or 30).
+ * Used by MonthlyEvolutionChart.
+ */
+export async function getMonthlyPayments(months = 6): Promise<PagoMensual[]> {
+  const admin = getAdminClient();
+  // Compute start of month (months-1) ago
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth() - (months - 1), 1);
+  const startPeriodo = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, "0")}`;
+
+  const { data: pagos, error } = await admin
+    .from("pagos")
+    .select("cliente_id, periodo, monto, fecha_pago")
+    .gte("periodo", startPeriodo)
+    .order("periodo", { ascending: true });
+  if (error) {
+    console.error("getMonthlyPayments error", error);
+    return [];
+  }
+
+  // Fetch clients to know their dia_pago
+  const clienteIds = Array.from(new Set((pagos ?? []).map((p) => p.cliente_id)));
+  const { data: clientes } = clienteIds.length > 0
+    ? await admin
+        .from("clientes")
+        .select("id, dia_pago")
+        .in("id", clienteIds)
+    : { data: [] as Array<{ id: string; dia_pago: number }> };
+  const clienteById = new Map((clientes ?? []).map((c) => [c.id, c]));
+
+  // Initialize buckets for the last `months` months (including current)
+  const buckets = new Map<string, PagoMensual>();
+  for (let i = 0; i < months; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - (months - 1 - i), 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    buckets.set(key, { periodo: key, dia15: 0, dia30: 0, total: 0, pagosCount: 0 });
+  }
+
+  for (const p of pagos ?? []) {
+    const b = buckets.get(p.periodo);
+    if (!b) continue;
+    const monto = sumSafe(p.monto);
+    const cliente = clienteById.get(p.cliente_id);
+    const dia = cliente?.dia_pago;
+    if (dia === 15) b.dia15 += monto;
+    else if (dia === 30) b.dia30 += monto;
+    b.total += monto;
+    b.pagosCount += 1;
+  }
+
+  return Array.from(buckets.values());
+}

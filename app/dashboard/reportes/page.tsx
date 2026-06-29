@@ -12,8 +12,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { CobranzaChart } from "@/components/reportes/cobranza-chart";
+import { MonthlyEvolutionChart } from "@/components/reportes/monthly-evolution-chart";
 import { ReportePeriodoSelect } from "@/components/reportes/reporte-periodo-select";
-import { getReporte, buildCsvFromReporte } from "@/lib/queries/reportes";
+import { getReporte, buildCsvFromReporte, getMonthlyPayments } from "@/lib/queries/reportes";
 import { formatMXN, formatWhatsApp, formatPeriodoLabel } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -25,6 +26,7 @@ interface PageProps {
 export default async function ReportesPage({ searchParams }: PageProps) {
   const { periodo } = await searchParams;
   const data = await getReporte(periodo);
+  const monthlyPayments = await getMonthlyPayments(6);
 
   // Build CSV and a data URL for the download button
   const csv = buildCsvFromReporte(data);
@@ -136,6 +138,19 @@ export default async function ReportesPage({ searchParams }: PageProps) {
         </CardHeader>
         <CardContent>
           <CobranzaChart data={data.porDiaPago} />
+        </CardContent>
+      </Card>
+
+      {/* Monthly evolution */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Evolución mensual de cobranza</CardTitle>
+          <CardDescription>
+            Últimos 6 meses · cobrado por día de pago (15 vs 30)
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <MonthlyEvolutionChart data={monthlyPayments} />
         </CardContent>
       </Card>
 

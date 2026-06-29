@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Bebas_Neue, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { themeScript } from "@/components/theme-toggle";
 import "./globals.css";
 
 const inter = Inter({
@@ -36,7 +37,12 @@ export default function RootLayout({
     <html
       lang="es-MX"
       className={`${inter.variable} ${bebasNeue.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        {/* Apply theme before paint to avoid FOUC */}
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="min-h-full flex flex-col font-sans">
         <TooltipProvider>
           {children}

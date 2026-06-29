@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { LogOut, Menu, User as UserIcon } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -61,6 +62,7 @@ export function Topbar({ user }: { user: User }) {
         </div>
 
         <DropdownMenu>
+          <ThemeToggle />
           <DropdownMenuTrigger className="flex items-center gap-2 px-2 sm:px-3 py-2 rounded-md hover:bg-zinc-100 outline-none focus-visible:ring-2 focus-visible:ring-alebrijes-orange">
             <div className="relative w-8 h-8 rounded-full bg-alebrijes-orange/10 flex items-center justify-center">
               <UserIcon className="w-4 h-4 text-alebrijes-orange" />
