@@ -334,22 +334,31 @@
 
 ### 3.3 — Función `enviar-recordatorios`
 
-- [ ] 3.3.1 — Crear `supabase/functions/enviar-recordatorios/index.ts`
-- [ ] 3.3.2 — Cargar todos los clientes activos
-- [ ] 3.3.3 — Por cada cliente:
-  - [ ] 3.3.3.1 — Calcular `proximaFechaPago` con lib `dates.ts`:
-    - [ ] 3.3.3.1.1 — Si hoy es día 1-14 y `dia_pago=15` → `proximaFechaPago` es día 15 de este mes
-    - [ ] 3.3.3.1.2 — Si hoy es día 16-29 y `dia_pago=30` → `proximaFechaPago` es día 30 de este mes (o último día si el mes tiene 28/29/31)
-    - [ ] 3.3.3.1.3 — Si ya pasó este mes → `proximaFechaPago` es día 15/30 del próximo mes
-  - [ ] 3.3.3.2 — `periodo` = `YYYY-MM` de `proximaFechaPago`
-  - [ ] 3.3.3.3 — `offsetDias` = diferencia en días entre hoy y `proximaFechaPago` (en TZ México)
-- [ ] 3.3.4 — Si `offsetDias` ∈ {-3, -1, 0, 1, 3, 7}:
-  - [ ] 3.3.4.1 — Verificar dedupe: no debe existir en `mensajes_enviados` (cliente_id, periodo, offsetDias)
-  - [ ] 3.3.4.2 — Verificar pago: no debe existir en `pagos` con ese `periodo`
-  - [ ] 3.3.4.3 — Verificar comprobante validado: no debe existir en `comprobantes_recibidos` con `estado='validado'` y `periodo_asignado=periodo`
-  - [ ] 3.3.4.4 — Llamar internamente a `enviar-mensaje` con la plantilla correspondiente
-- [ ] 3.3.5 — Retornar resumen `{ enviados, omitidos, fallidos }`
-- [ ] 3.3.6 — Commit: `feat(functions): daily reminders cron trigger`
+- [x] 3.3.1 — Creado `supabase/functions/enviar-recordatorios/index.ts` (321 líneas, Deno)
+- [x] 3.3.2 — Carga todos los clientes con `activo = true` desde `public.clientes`
+- [x] 3.3.3 — Por cada cliente:
+  - [x] 3.3.3.1 — Calcula `proximaFechaPago` con funciones internas (en `America/Mexico_City`):
+    - [x] Si `dia_pago=15` y hoy es 1-14 → 15 de este mes
+    - [x] Si `dia_pago=30` y hoy es 1-15 → día 30 (o último día si mes tiene <30)
+    - [x] Si ya pasó este mes → día 15/30 del próximo mes (con manejo de diciembre→enero)
+    - [x] Manejo de meses con 28/29/30 días (Feb, etc.)
+  - [x] 3.3.3.2 — `periodo` = `YYYY-MM` derivado de `proximaFechaPago`
+  - [x] 3.3.3.3 — `offsetDias` = diferencia en días entre hoy y `proximaFechaPago` (usando `Date.UTC` para evitar drift de DST)
+- [x] 3.3.4 — Si `offsetDias ∈ {-3, -1, 0, 1, 3, 7}`:
+  - [x] 3.3.4.1 — Dedupe: verifica que no exista en `mensajes_enviados (cliente_id, periodo, offset_dias)`
+  - [x] 3.3.4.2 — Pago: verifica que no exista en `pagos` con ese `periodo`
+  - [x] 3.3.4.3 — Comprobante validado: verifica que no exista en `comprobantes_recibidos` con `estado='validado'` y `periodo_asignado=periodo`
+  - [x] 3.3.4.4 — Envía directamente via Meta API (no llama a `enviar-mensaje` para evitar HTTP overhead) + `upsert` en `mensajes_enviados` con `onConflict: cliente_id, periodo, offset_dias`
+- [x] 3.3.5 — Retorna `{ ok, total, enviados, omitidos, fallidos, detalles: [] }` (resumen para logging)
+- [x] 3.3.6 — Commit: `feat(functions): daily reminders cron with Mexico TZ date math and skip checks` (commit `e3659f6`)
+
+### Extras incluidos
+- 🔐 **Auth**: requiere header `X-Cron-Secret` (o query param `secret`) que coincide con `CRON_SECRET` env var
+- 🌎 **Timezone-safe**: usa `Intl.DateTimeFormat('America/Mexico_City')` + `Date.UTC()` para evitar problemas de DST
+- 🛡️ **Fail-open** en checks: si hay error de DB, intenta enviar (mejor enviar duplicado que perder mensaje)
+- ⚡ **Performance**: carga plantillas una vez en cache (`plantillasByOffset` Map)
+- 📊 **Logging**: cada cliente logueado con action + offset + periodo
+- 📅 **Manejo de fin de mes**: `Math.min(diaPago, lastDayOfMonth)` evita fechas inválidas en Feb (28/29), meses de 30 días, etc.
 
 ### 3.4 — Configurar secretos y deploy
 
