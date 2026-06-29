@@ -1045,21 +1045,32 @@ Route (app)
 
 ### 8.1 — Deploy del Frontend en Vercel
 
-- [ ] 8.1.1 — Crear cuenta en [vercel.com](https://vercel.com) (sign in with GitHub)
-- [ ] 8.1.2 — Opción A: Subir el repo a GitHub primero → Importar en Vercel
-  - [ ] 8.1.2.1 — `git remote add origin <repo-url>`
-  - [ ] 8.1.2.2 — `git push -u origin main`
-  - [ ] 8.1.2.3 — En Vercel → New Project → Import repo
-- [ ] 8.1.3 — Opción B: Deploy directo con CLI
-  - [ ] 8.1.3.1 — `vercel login`
-  - [ ] 8.1.3.2 — `vercel` (sigue el wizard)
-- [ ] 8.1.4 — Configurar variables de entorno en Vercel (Project Settings → Environment Variables):
-  - [ ] 8.1.4.1 — `NEXT_PUBLIC_SUPABASE_URL`
-  - [ ] 8.1.4.2 — `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-  - [ ] 8.1.4.3 — `NEXT_PUBLIC_APP_NAME`
-  - [ ] 8.1.4.4 — `NEXT_PUBLIC_PAYMENT_INFO`
-- [ ] 8.1.5 — Deploy: `vercel --prod` o push a main
-- [ ] 8.1.6 — Anotar URL de producción: `https://alebrijes-cobranza.vercel.app`
+- [x] 8.1.1 — Vercel CLI 54.9.1 ya instalado; autenticado con token del usuario como `alebrijesteotihuacanoficial-2469`
+- [x] 8.1.2 — **Opción A usada** (GitHub → Vercel):
+  - [x] 8.1.2.1 — `git remote add origin https://github.com/alebrijesteotihuacan/AlebrijesCobranza.git`
+  - [x] 8.1.2.2 — `git push -u origin main` (con `git branch -M main` previo)
+  - [x] 8.1.2.3 — Deploy via CLI con `vercel --name alebrijes-cobranza --token <TOKEN>` (creó proyecto y link automático)
+- [x] 8.1.4 — Variables de entorno configuradas via **Vercel REST API** (POST `/v10/projects/{id}/env`):
+  - [x] 8.1.4.1 — `NEXT_PUBLIC_SUPABASE_URL` (sensitive, creada por `vercel env add` previo)
+  - [x] 8.1.4.2 — `NEXT_PUBLIC_SUPABASE_ANON_KEY` (plain) — HTTP 201
+  - [x] 8.1.4.3 — `NEXT_PUBLIC_APP_NAME` (plain) — HTTP 201
+  - [x] 8.1.4.4 — `NEXT_PUBLIC_PAYMENT_INFO` (plain) — HTTP 201
+- [x] 8.1.5 — **2 deploys realizados**:
+  - Primer deploy (sin env vars): `5aa20bf` → URL temporal
+  - Re-deploy (con env vars): `ga2isfrwe` → Build 32s, Ready in 49s
+  - Bonus: `chore: add .vercel to gitignore` push a GitHub
+- [x] 8.1.6 — **URL de producción**: **`https://alebrijes-cobranza.vercel.app`** ✅
+  - Alias técnico: `https://alebrijes-cobranza-ga2isfrwe.vercel.app`
+  - Dashboard: `https://vercel.com/alebrijesteotihuacanoficial-2469s-projects/alebrijes-cobranza`
+
+### Verificación E2E
+- `GET https://alebrijes-cobranza.vercel.app/` → **HTTP 307** (redirect a /login) ✓
+- `GET https://alebrijes-cobranza.vercel.app/login` → **HTTP 200**, 18KB, contiene "ALEBRIJES" ✓
+- Login con `admin@alebrijes.com` / `AlebrijesCobranza2026!` → **HTTP 200**, access_token recibido, role: authenticated ✓
+
+### Commits relacionados
+- `7b859fa` — fix: add missing auth/layout files (pre-push)
+- `91b4a9c` — chore: add .vercel to gitignore (post-deploy)
 
 ### 8.2 — Configurar Webhook en Meta
 
