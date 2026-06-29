@@ -1004,26 +1004,38 @@ Route (app)
 
 ### 7.7 — Configuración
 
-- [ ] 7.7.1 — `app/(app)/dashboard/configuracion/page.tsx`
-- [ ] 7.7.2 — Sección 1: **Información de pago**
-  - [ ] 7.7.2.1 — Textarea con el contenido de `NEXT_PUBLIC_PAYMENT_INFO`
-  - [ ] 7.7.2.2 — Guardar en una tabla `configuracion` (key-value) o en variable de entorno del servidor
-- [ ] 7.7.3 — Sección 2: **Plantillas de mensaje**
-  - [ ] 7.7.3.1 — Lista de las 8 plantillas (solo las editables: las 6 automáticas + pago_validado + pago_rechazado)
-  - [ ] 7.7.3.2 — Editor inline con preview de variables disponibles (`{{nombre}}`, `{{monto}}`, etc.)
-  - [ ] 7.7.3.3 — Toggle activo/inactivo
-  - [ ] 7.7.3.4 — Guardar cambios en `plantillas`
-- [ ] 7.7.4 — Sección 3: **Info de la cuenta**
-  - [ ] 7.7.4.1 — Email del admin
-  - [ ] 7.7.4.2 — Botón "Cerrar sesión" / "Cambiar contraseña"
-- [ ] 7.7.5 — Commit: `feat(configuracion): settings page`
+- [x] 7.7.1 — `app/dashboard/configuracion/page.tsx` (Server Component, dynamic, con auth check via `createClient` + `redirect("/login")`)
+- [x] 7.7.2 — Sección 1: **Información de pago**:
+  - [x] 7.7.2.1 — Textarea con valor inicial de `getInfoPago()` desde tabla `configuracion`
+  - [x] 7.7.2.2 — Migración `20260628150000_configuracion.sql` crea tabla key-value con RLS deny-all; seed con `info_pago`; server action `updateInfoPagoAction` con validación Zod (1-1000 chars)
+- [x] 7.7.3 — Sección 2: **Plantillas de mensaje**:
+  - [x] 7.7.3.1 — Lista de las 8 plantillas con header de offset y label
+  - [x] 7.7.3.2 — Editor inline: Collapsible por plantilla, Textarea 5 rows, preview de variables (`{{nombre}}`, `{{monto}}`, `{{dia_pago}}`, `{{periodo}}`, `{{categoria}}`, `{{info_pago}}`) en `<details>` expandible
+  - [x] 7.7.3.3 — Toggle activo/inactivo con shadcn `Switch`
+  - [x] 7.7.3.4 — Server action `updatePlantillaAction(id, { plantilla, activo })` con validación Zod
+- [x] 7.7.4 — Sección 3: **Info de la cuenta**:
+  - [x] 7.7.4.1 — Card con avatar + nombre + email del admin desde `auth.getUser()`
+  - [x] 7.7.4.2 — Botón "Cerrar sesión" (`signOut` + redirect a `/login`); link al Supabase Dashboard para cambiar contraseña
+- [x] 7.7.5 — Commit: `feat(configuracion): settings page with info pago, plantillas editor, account info` (commit `0c86281`)
 
 ### Criterios de Salida Fase 7
-- [ ] Comprobantes se ven, validan y rechazan end-to-end
-- [ ] Storage se borra al resolver
-- [ ] Mensajes automáticos de validación/rechazo se envían
-- [ ] Plantillas editables desde UI
-- [ ] Números desconocidos tienen vista dedicada
+- [x] Comprobantes se ven, validan y rechazan end-to-end (Fases 7.1-7.4)
+- [x] Storage se borra al resolver (validar/rechazar eliminan el archivo)
+- [x] Mensajes automáticos de validación/rechazo se envían (via `enviar-mensaje` Edge Function)
+- [x] Plantillas editables desde UI (Sección 2 con editor inline)
+- [x] Números desconocidos tienen vista dedicada (`/dashboard/desconocidos`)
+
+### Extras incluidos
+- 🛠️ **Migración** `20260628150000_configuracion.sql` con RLS deny-all
+- 🛠️ **`lib/queries/configuracion.ts`** con `getConfiguracion(key)` y `getInfoPago()` (con default fallback)
+- 🛠️ **`lib/actions/configuracion.ts`** con 2 server actions validadas con Zod
+- 🎨 **PlantillasEditor** con `Collapsible` por item (expandible individualmente)
+- 🔍 **Variables preview** en `<details>` expandible con descripciones
+- 🛡️ **Validación dual** (cliente + servidor) con Zod
+- 📱 **Responsive** con grid adaptativo
+- 🎯 **Dirty state** con botones "Cancelar" / "Guardar" solo cuando hay cambios
+- 🔒 **Logout seguro** con `signOut` y `router.refresh()`
+- 🆕 **Switch component** agregado via shadcn CLI
 
 ---
 
