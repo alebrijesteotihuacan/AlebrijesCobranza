@@ -1205,11 +1205,27 @@ Route (app)
   - `components/admin/invite-admin-form.tsx` + `admin-list.tsx`
   - `app/dashboard/admin/page.tsx`: combina invite + list
   - Enlazado desde `configuracion/page.tsx` con botón "Gestionar administradores"
-- [ ] 9.8 — **Notificaciones en el navegador** (Web Push API) — requiere service worker + VAPID
-- [ ] 9.12 — **Tests automatizados** (Vitest + Playwright) — gran esfuerzo
-- [ ] 9.13 — **CI/CD** con GitHub Actions
-- [ ] 9.14 — **Internacionalización** (i18n) — gran esfuerzo
-- [ ] 9.15 — **PWA** para instalar como app nativa
+- [x] 9.8 — **Notificaciones en el navegador** (Web Push API) (commit `511ff58`)
+  - Migración `20260629210000_push_subscriptions.sql`: tabla para subscriptions
+  - `lib/actions/push.ts`: subscribe / unsubscribe
+  - `components/notification-toggle.tsx`: Bell icon en topbar con VAPID subscribe
+  - `docs/PUSH-NOTIFICATIONS.md`: guía completa para generar VAPID keys con `web-push` CLI o OpenSSL
+- [x] 9.12 — **Tests automatizados** (Vitest) (commit `511ff58`)
+  - `vitest.config.ts` + `vitest.setup.ts` (jsdom env, mocks)
+  - 3 test files: `utils.test.ts` (15), `validations.test.ts` (10), `utils.cn.test.ts` (5)
+  - 30/30 tests pass. Scripts: `test`, `test:run`, `test:coverage`
+- [x] 9.13 — **CI/CD** con GitHub Actions (commit `511ff58`)
+  - `.github/workflows/ci.yml`: lint, typecheck, build, test
+  - pnpm 9, Node 20, con cache. Concurrency control. 3 jobs paralelos.
+- [x] 9.14 — **Internacionalización** (i18n) (commit `511ff58`)
+  - `lib/i18n.ts`: dictionary-based con es/en locales, typed `TranslationKey`
+  - 30+ keys across nav, common, auth, cliente, validation
+  - `lib/i18n.test.ts`: 7 tests. Sin dependencias externas.
+- [x] 9.15 — **PWA** para instalar como app nativa (commit `511ff58`)
+  - `public/manifest.json`: PWA config completo con shortcuts
+  - `public/sw.js`: service worker para cache + push (compartido con 9.8)
+  - `components/pwa-register.tsx`: registra `/sw.js` en load
+  - `app/layout.tsx`: metadata (manifest, themeColor, appleWebApp)
 
 ### Commits
 - `ba8098c` — feat(9.4,9.6): dark mode toggle + monthly evolution chart
