@@ -924,12 +924,40 @@ Route (app)
 
 ### 7.5 — Números Desconocidos
 
-- [ ] 7.5.1 — `app/(app)/dashboard/desconocidos/page.tsx`
-- [ ] 7.5.2 — Lista de mensajes de números no registrados
-- [ ] 7.5.3 — Para cada uno: teléfono, texto, fecha, tipo
-- [ ] 7.5.4 — Botón "Dar de alta como cliente" → redirige a `/clientes/nuevo` con `whatsapp` prellenado
-- [ ] 7.5.5 — Botón "Marcar como ignorado" → delete del registro
-- [ ] 7.5.6 — Commit: `feat(desconocidos): unknown numbers inbox`
+- [x] 7.5.1 — `app/dashboard/desconocidos/page.tsx` (Server Component, dynamic)
+- [x] 7.5.2 — Lista via `getMensajesDesconocidos(100)` en `lib/queries/desconocidos.ts`:
+  - Ordena por `recibido_at desc`
+  - 3 KPIs: Total / Últimas 24h / Últimos 7 días
+- [x] 7.5.3 — `DesconocidoCard` muestra:
+  - **Teléfono** formateado (e.g. `+52 55 1234 5678`)
+  - **Tipo** con icono (image/document/text/video/audio) y label
+  - **Texto** como blockquote italic con `line-clamp-3`
+  - **Fecha relativa** (`formatRelativeTime` → "Hace 2h")
+  - Color amber de "advertencia" (no es cliente conocido)
+- [x] 7.5.4 — **Botón "Dar de alta como cliente"**:
+  - Link a `/dashboard/clientes/nuevo?whatsapp=52XXXXXXXXXX` (URL-encoded)
+  - Botón naranja Alebrijes primario
+  - Icono `UserPlus`
+- [x] 7.5.5 — **Botón "Marcar como ignorado"**:
+  - Abre Dialog de confirmación
+  - Server action `ignorarDesconocidoAction(id)` con `delete` y `revalidatePath`
+  - Botón secundario con Dialog "Sí, ignorar"
+  - Toast de éxito
+- [x] 7.5.6 — **Botón "Ignorar todos"** (en header cuando hay >0):
+  - Server action con form action (Server Component → Server Action)
+  - Borra todos los registros
+- [x] 7.5.7 — Empty state cuando no hay mensajes:
+  - Card verde con icono `Phone` y mensaje "Sin números desconocidos"
+  - Descripción: "Todos los mensajes recibidos corresponden a clientes registrados."
+- [x] 7.5.8 — Commit: `feat(desconocidos): unknown numbers inbox with dar de alta + ignorar actions` (commit `3a4080d`)
+
+### Extras incluidos
+- 🛠️ **`lib/queries/desconocidos.ts`** con `getMensajesDesconocidos` + `getDesconocidosKpis` (cálculo de 24h/7d en memoria)
+- 🛠️ **`lib/actions/desconocidos.ts`** con 2 server actions: `ignorarDesconocidoAction` y `ignorarTodosDesconocidosAction`
+- 🎨 **Iconografía específica** por tipo (Image, FileText, Type, Video, MessageSquare)
+- 📱 **Responsive**: card se adapta a mobile
+- 🔗 **Pre-fill via URL**: el link a `/clientes/nuevo` ya tiene el whatsapp, pero el `ClienteForm` no lo lee aún (mejora futura)
+- ⚠️ **Server action inline** en form (sin client component extra para "Ignorar todos")
 
 ### 7.6 — Mensajes Enviados (log)
 
