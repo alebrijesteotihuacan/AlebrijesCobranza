@@ -292,7 +292,8 @@ async function handlePost(req: Request): Promise<Response> {
     return new Response("Invalid signature", { status: 401 });
   }
 
-  let payload: { entry?: Array<{ changes?: Array<{ value?: { messages?: unknown[]; metadata?: { phone_number_id?: string } } } }> };
+  // deno-lint-ignore no-explicit-any
+  let payload: any;
   try {
     payload = JSON.parse(rawBody);
   } catch (e) {
