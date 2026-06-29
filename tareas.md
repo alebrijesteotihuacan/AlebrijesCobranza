@@ -890,9 +890,37 @@ Route (app)
 
 ### 7.4 — Vista de validados/rechazados
 
-- [ ] 7.4.1 — Tabs en `/comprobantes`: Pendientes | Validados | Rechazados
-- [ ] 7.4.2 — Tabs de Validados/Rechazados muestran histórico (sin archivo, solo metadatos)
-- [ ] 7.4.3 — Filtro por rango de fechas
+- [x] 7.4.1 — Tabs en `/comprobantes`: Pendientes | Validados | Rechazados
+  - Pills con colores semánticos y count badges
+  - URL-driven: `?estado=pendiente|validado|rechazado|todos`
+  - Implementado en 7.1
+- [x] 7.4.2 — Tabs de Validados/Rechazados muestran histórico (sin archivo, solo metadatos):
+  - **ComprobanteCard** ahora detecta `c.estado !== "pendiente"` y renderiza vista histórica:
+    - Thumbnail reemplazado por icono `FileX` con label "Archivo validado/rechazado (borrado por política)"
+    - Badge prominente: "Validado" verde o "Rechazado" rojo
+    - **Motivo del rechazo** visible en card con background `alebrijes-red/5` y borde rojo
+    - **Periodo asignado** visible para validados (formato "Aplicado a: Junio 2026")
+    - Fechas: "Recibido hace X" + "Validado/Rechazado hace Y"
+    - Botones Validar/Rechazar/Abrir ocultos; solo "Ver cliente" si hay cliente
+- [x] 7.4.3 — Filtro por rango de fechas:
+  - `components/comprobantes/date-range-filter.tsx` con dos `<Input type="date">`
+  - URL-driven: `?from=YYYY-MM-DD&to=YYYY-MM-DD`
+  - Solo visible para tabs "validados" y "rechazados" (no en "pendientes")
+  - Validación: `min`/`max` cross-validation
+  - Botón X para limpiar
+  - Empty state cambia mensaje cuando hay filtro activo
+- [x] 7.4.4 — Commit: `feat(comprobantes): historical view for validated/rejected + date range filter` (commit `a73f2eb`)
+
+### Extras incluidos
+- 🛠️ **Query actualizada** `getComprobantesByEstado(estado, { from, to, limit })` con filtros `gte`/`lte` en `recibido_at`
+- 🎨 **Vista histórica** sin thumbnail (reemplazado por icono `FileX` con label contextual)
+- 📋 **Badge dual** (tipo + estado) en la esquina superior
+- 💬 **Motivo del rechazo** destacado con fondo rojo suave
+- 📅 **Periodo asignado** visible con formato "Junio 2026"
+- 🕐 **Timestamps duales**: recibido + validado/rechazado (formato relative)
+- 🎯 **Filtro no aplica a "pendientes"** (siempre se ven todos los pendientes)
+- 📱 **Responsive**: filtro en row horizontal con flex-1, X button accesible
+- ⚠️ **Mensaje contextual de empty state** cuando hay filtro activo
 
 ### 7.5 — Números Desconocidos
 
