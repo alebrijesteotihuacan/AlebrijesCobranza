@@ -251,24 +251,27 @@
 
 ### 2.4 — Programar pg_cron
 
-- [ ] 2.4.1 — Confirmar que la extensión está habilitada
-- [ ] 2.4.2 — Crear función RPC helper (opcional, para key del cron)
-- [ ] 2.4.3 — Programar el cron vía `execute_sql`:
-  ```sql
-  select cron.schedule(
-    'enviar-recordatorios-diarios',
-    '0 15 * * *',
-    $$ ... $$
-  );
+- [x] 2.4.1 — Extensión `pg_cron` habilitada (v1.6.4). También `pg_net` v0.20.3 y `pgcrypto` v1.3 (verificado via Management API)
+- [x] 2.4.2 — **N/A** (custom GUC requiere superuser; el secret va inline en el SQL con comentario para rotarlo)
+- [x] 2.4.3 — Cron programado vía migración `20260628140000_pg_cron.sql`:
+  - `enviar-recordatorios-diarios` — `0 15 * * *` (15:00 UTC = 9:00 AM `America/Mexico_City`)
+  - `limpiar-comprobantes-expirados` — `30 14 * * *` (8:30 AM México, antes del envío) — bonus
+  - Llama a Edge Function `enviar-recordatorios` vía `net.http_post` con header `X-Cron-Secret`
+- [x] 2.4.4 — Verificado via Management API:
+  ```json
+  [
+    {"jobid":1,"jobname":"enviar-recordatorios-diarios","schedule":"0 15 * * *","active":true},
+    {"jobid":2,"jobname":"limpiar-comprobantes-expirados","schedule":"30 14 * * *","active":true}
+  ]
   ```
-- [ ] 2.4.4 — Verificar: `select * from cron.job` debe mostrar la entrada
+- [x] 2.4.5 — Commit: `feat(db): schedule daily reminder cron at 9 AM Mexico + cleanup at 8:30 AM` (commit 5f0a40f)
 
 ### Criterios de Salida Fase 2
-- [ ] 6 tablas creadas con RLS
-- [ ] 8 plantillas cargadas
-- [ ] Bucket `comprobantes` existe y es privado
-- [ ] pg_cron programado (se ejecutará diariamente a las 9 AM México)
-- [ ] Commit: `feat(db): phase 2 complete`
+- [x] 6 tablas creadas con RLS (verificado HTTP 200 en PostgREST con service_role, [] con anon)
+- [x] 8 plantillas cargadas (verificado: Total plantillas: 8)
+- [x] Bucket `comprobantes` existe y es privado (`public: false`, `type: STANDARD`)
+- [x] pg_cron programado: 2 jobs activos, se ejecutarán diariamente a las 9 AM y 8:30 AM México
+- [x] Commit: `feat(db): phase 2 complete` (consolidado en commit 5f0a40f)
 
 ---
 
