@@ -77,78 +77,24 @@
 
 > **Tiempo: 10 min**
 
-- [ ] 0.1 — Confirmar estructura base: `C:\Users\52558\OneDrive\Documentos\Alebrijes Teotihuacán\AlebrijesCobranza\`
-- [ ] 0.2 — Verificar archivos previos:
-  - [ ] 0.2.1 — `plan.md` existe
-  - [ ] 0.2.2 — `README.md` existe
-  - [ ] 0.2.3 — `assets/` contiene las 2 imágenes
-- [ ] 0.3 — Crear carpetas vacías con `.gitkeep` (estructura base del proyecto):
-  ```
-  AlebrijesCobranza/
-  ├── app/                    (vacía, se llena con Next.js)
-  ├── components/             (vacía)
-  ├── lib/                    (vacía)
-  ├── public/assets/          (vacía, se copia en 0.4)
-  ├── supabase/
-  │   ├── functions/          (vacía)
-  │   └── migrations/         (vacía)
-  ├── types/                  (vacía)
-  └── tests/                  (vacía, opcional)
-  ```
-- [ ] 0.4 — Copiar assets a `public/assets/`:
-  - [ ] 0.4.1 — `assets/Alebrijes Teotihuacan.png` → `public/assets/alebrijes-logo.png`
-  - [ ] 0.4.2 — `assets/03_TEOTIHUACAN_-_Fuerzas_Basicas.png` → `public/assets/alebrijes-escudo.png`
-- [ ] 0.5 — Crear `.gitignore` raíz (Next.js + Node + env files):
-  ```gitignore
-  # dependencies
-  node_modules/
-  .pnp
-  .pnp.js
-
-  # testing
-  coverage/
-
-  # next.js
-  .next/
-  out/
-  build/
-  dist/
-
-  # production
-  *.tsbuildinfo
-  next-env.d.ts
-
-  # misc
-  .DS_Store
-  *.pem
-  Thumbs.db
-
-  # debug
-  npm-debug.log*
-  yarn-debug.log*
-  yarn-error.log*
-  pnpm-debug.log*
-
-  # local env files
-  .env*.local
-  .env
-
-  # vercel
-  .vercel
-
-  # typescript
-  *.tsbuildinfo
-
-  # supabase
-  supabase/.branches
-  supabase/.temp
-  ```
+- [x] 0.1 — Confirmar estructura base: `C:\Users\52558\OneDrive\Documentos\Alebrijes Teotihuacán\AlebrijesCobranza\`
+- [x] 0.2 — Verificar archivos previos:
+  - [x] 0.2.1 — `plan.md` existe
+  - [x] 0.2.2 — `README.md` existe
+  - [x] 0.2.3 — `assets/` contiene las 2 imágenes
+- [x] 0.3 — Crear carpetas vacías con `.gitkeep`:
+  - [x] app/, components/, lib/, public/assets/, supabase/functions/, supabase/migrations/, types/, tests/
+- [x] 0.4 — Copiar assets a `public/assets/`:
+  - [x] 0.4.1 — `assets/Alebrijes Teotihuacan.png` → `public/assets/alebrijes-logo.png` (1.05 MB)
+  - [x] 0.4.2 — `assets/03_TEOTIHUACAN_-_Fuerzas_Basicas.png` → `public/assets/alebrijes-escudo.png` (432 KB)
+- [x] 0.5 — `.gitignore` creado con reglas para Next.js, Node, env files, Supabase, IDEs
+- [x] 0.6 — `git init` + `git config user` + primer commit: `chore: initial project structure with docs, assets, and gitignore` (commit 0310ce0)
 
 ### Criterios de Salida Fase 0
-- [ ] Estructura de carpetas creada
-- [ ] Assets copiados
-- [ ] `.gitignore` en su lugar
-- [ ] `git init` ejecutado y primer commit: `chore: initial structure`
+- [x] Estructura de carpetas creada
+- [x] Assets copiados
+- [x] `.gitignore` en su lugar
+- [x] `git init` ejecutado y primer commit hecho
 
 ---
 
@@ -158,84 +104,81 @@
 
 ### 1.1 — Crear proyecto Next.js
 
-- [ ] 1.1.1 — En la raíz del proyecto, ejecutar:
+- [1] 1.1.1 — En la raíz del proyecto, ejecutar:
   ```bash
   npx create-next-app@latest . --typescript --tailwind --app --no-src-dir --import-alias "@/*" --eslint --use-pnpm
   ```
-  - [ ] Responder "Yes" al overwrite si pide sobreescribir archivos
-- [ ] 1.1.2 — Verificar que se generó: `package.json`, `next.config.ts`, `tsconfig.json`, `tailwind.config.ts`, `app/`, `app/page.tsx`
-- [ ] 1.1.3 — Verificar versión de Next.js ≥ 15.0.0 en `package.json`
-- [ ] 1.1.4 — Commit: `chore: bootstrap next.js 15`
+  - [1] Responder "Yes" al overwrite si pide sobreescribir archivos
+- [1] 1.1.2 — Verificar que se generó: `package.json`, `next.config.ts`, `tsconfig.json`, `tailwind.config.ts`, `app/`, `app/page.tsx`
+- [1] 1.1.3 — Verificar versión de Next.js ≥ 15.0.0 en `package.json`
+- [1] 1.1.4 — Commit: `chore: bootstrap next.js 15`
 
 ### 1.2 — Instalar dependencias base
 
-- [ ] 1.2.1 — Cliente Supabase:
+- [1] 1.2.1 — Cliente Supabase:
   ```bash
   pnpm add @supabase/supabase-js @supabase/ssr
   ```
-- [ ] 1.2.2 — Fechas con zona horaria:
+- [1] 1.2.2 — Fechas con zona horaria:
   ```bash
   pnpm add date-fns date-fns-tz
   ```
-- [ ] 1.2.3 — Validación:
+- [1] 1.2.3 — Validación:
   ```bash
   pnpm add zod
   ```
-- [ ] 1.2.4 — Iconos:
+- [1] 1.2.4 — Iconos:
   ```bash
   pnpm add lucide-react
   ```
-- [ ] 1.2.5 — Utilidades:
+- [1] 1.2.5 — Utilidades:
   ```bash
   pnpm add clsx tailwind-merge class-variance-authority
   ```
-- [ ] 1.2.6 — (Opcional, para reportes) Gráficas:
+- [1] 1.2.6 — (Opcional, para reportes) Gráficas:
   ```bash
   pnpm add recharts
   ```
-- [ ] 1.2.7 — Commit: `chore: install runtime dependencies`
+- [1] 1.2.7 — Commit: `chore: install runtime dependencies`
 
 ### 1.3 — Configurar shadcn/ui
 
-- [ ] 1.3.1 — Inicializar shadcn:
+- [x] 1.3.1 — Inicializar shadcn:
   ```bash
-  pnpm dlx shadcn@latest init
+  pnpm dlx shadcn@latest init --defaults --yes
   ```
-  - [ ] Style: **New York** (más limpio) o **Default** (más simple) — a elección
-  - [ ] Base color: **Neutral** (mejor para customizar)
-  - [ ] CSS variables: **Yes**
-- [ ] 1.3.2 — Verificar que se creó `components.json` y `lib/utils.ts`
-- [ ] 1.3.3 — Agregar componentes shadcn necesarios:
+  - [x] Style: **base-nova** (default moderno, similar a New York)
+  - [x] Base color: **neutral** (mejor para customizar)
+  - [x] CSS variables: **Yes**
+  - [x] Icon library: **lucide**
+  - [x] Aliases: `@/components`, `@/lib/utils`, `@/components/ui`, `@/lib`, `@/hooks`
+- [x] 1.3.2 — Verificar que se creó `components.json` y `lib/utils.ts` ✓
+- [x] 1.3.3 — Agregar componentes shadcn necesarios:
   ```bash
-  pnpm dlx shadcn@latest add button input label card badge dialog dropdown-menu select table textarea toast sonner alert separator avatar sheet tabs tooltip
+  pnpm dlx shadcn@latest add button input label card badge dialog dropdown-menu select table textarea sonner alert separator avatar sheet tabs tooltip --yes
   ```
-- [ ] 1.3.4 — Commit: `chore: setup shadcn/ui with base components`
+  - [x] 16 archivos creados en `components/ui/`:
+    - alert, avatar, badge, button, card, dialog, dropdown-menu, input, label, select, separator, sheet, sonner, table, tabs, textarea, tooltip
+  - ⚠️ Nota: el plan mencionaba "toast" pero shadcn ahora usa **sonner** como su sistema de toasts
+- [x] 1.3.4 — Commit: `chore: setup shadcn/ui with base components` (commit 79566d4)
 
 ### 1.4 — Paleta de colores Alebrijes
 
-- [ ] 1.4.1 — Editar `app/globals.css` para extender las CSS variables de Tailwind con la paleta:
-  ```css
-  @layer base {
-    :root {
-      --alebrijes-orange: 244 121 32;        /* #F47920 */
-      --alebrijes-orange-dark: 196 90 18;    /* #C45A12 */
-      --alebrijes-red: 214 58 26;            /* #D63A1A */
-      --alebrijes-black: 10 10 10;           /* #0A0A0A */
-      --background: 0 0% 100%;
-      --foreground: 0 0% 4%;
-      --primary: var(--alebrijes-orange);
-      --primary-foreground: 0 0% 100%;
-      /* ... resto de vars estándar de shadcn ... */
-    }
-  }
-  ```
-- [ ] 1.4.2 — Editar `tailwind.config.ts` para registrar las nuevas utilities `bg-alebrijes-orange`, `text-alebrijes-red`, etc.
-- [ ] 1.4.3 — Importar fuentes en `app/layout.tsx`:
-  - [ ] 1.4.3.1 — `Inter` para cuerpo (Google Fonts o next/font)
-  - [ ] 1.4.3.2 — `Bebas_Neue` para títulos (Google Fonts)
-- [ ] 1.4.4 — Verificar render: levantar `pnpm dev` y abrir `http://localhost:3000`
-- [ ] 1.4.5 — Reemplazar contenido default de `app/page.tsx` con un redirect a `/login` (lo implementamos en Fase 4)
-- [ ] 1.4.6 — Commit: `feat: alebrijes color palette and fonts`
+- [x] 1.4.1 — Editar `app/globals.css` con la paleta Alebrijes (formato `oklch()` para Tailwind v4)
+  - [x] Variables CSS custom: `--alebrijes-orange`, `--alebrijes-orange-dark`, `--alebrijes-red`, `--alebrijes-black`, `--alebrijes-success`, `--alebrijes-warning`
+  - [x] Override de tokens semánticos de shadcn: `--primary`, `--primary-foreground`, `--destructive`, `--ring`, `--chart-*`, `--sidebar-*` → usan la paleta Alebrijes
+  - [x] Mapeo en `@theme inline` para generar utilities Tailwind: `bg-alebrijes-orange`, `text-alebrijes-red`, etc.
+  - [x] Soporte para dark mode en `.dark` con la misma paleta
+- [x] 1.4.2 — **N/A**: Tailwind v4 no usa `tailwind.config.ts` — la configuración se hace en CSS con `@theme inline`
+- [x] 1.4.3 — Importar fuentes en `app/layout.tsx`:
+  - [x] 1.4.3.1 — `Inter` (Google Fonts vía `next/font/google`) → cuerpo
+  - [x] 1.4.3.2 — `Bebas_Neue` (Google Fonts vía `next/font/google`) → títulos (`h1`–`h6` con `font-heading`)
+  - [x] Geist Mono para `--font-geist-mono` (mantenido)
+  - [x] `Toaster` de sonner y `TooltipProvider` agregados al root
+  - [x] `lang="es-MX"` y metadata de la app
+- [x] 1.4.4 — Verificar render: `pnpm build` exitoso (compiló en 18s, TypeScript OK, 4 páginas estáticas)
+- [x] 1.4.5 — `app/page.tsx` reemplazado: `redirect("/login")` (la página /login se implementa en Fase 4)
+- [x] 1.4.6 — Commit: `feat: alebrijes color palette, brand fonts, and root redirect` (commit 4b0d868)
 
 ### 1.5 — Variables de entorno locales
 
