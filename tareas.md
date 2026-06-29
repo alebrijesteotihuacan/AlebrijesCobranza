@@ -557,23 +557,51 @@
 
 ### 5.2 — Crear cliente
 
-- [ ] 5.2.1 — `app/(app)/dashboard/clientes/nuevo/page.tsx`
-- [ ] 5.2.2 — Crear `lib/validations.ts`:
-  ```ts
-  export const clienteSchema = z.object({
-    nombre: z.string().min(2).max(100),
-    whatsapp: z.string().regex(/^52\d{10}$/, 'Debe ser 52 + 10 dígitos'),
-    dia_pago: z.union([z.literal(15), z.literal(30)]),
-    monto: z.number().positive().max(99999),
-    categoria: z.string().optional(),
-    notas: z.string().optional(),
-  });
-  ```
-- [ ] 5.2.3 — Crear `components/clientes/cliente-form.tsx` con shadcn Form + Zod resolver
-- [ ] 5.2.4 — Server action `crearCliente(data)` que inserta en Supabase
-- [ ] 5.2.5 — Submit → crear → toast éxito → redirect a `/clientes`
-- [ ] 5.2.6 — Validación en cliente Y servidor
-- [ ] 5.2.7 — Commit: `feat(clientes): create form with validation`
+- [x] 5.2.1 — `app/dashboard/clientes/nuevo/page.tsx` (Server Component que renderiza `<ClienteForm mode="create" />`)
+- [x] 5.2.2 — `lib/validations.ts` (creado en Fase 5.1):
+  - `clienteSchema` con `nombre` (2-100), `whatsapp` (regex 52+10), `dia_pago` (15|30), `monto` (>0, max 99999.99), `categoria` y `notas` opcionales
+  - Más estricto que el plan: `trim()`, mensajes de error específicos, monto con 2 decimales
+- [x] 5.2.3 — `components/clientes/cliente-form.tsx` con:
+  - `react-hook-form` + `zodResolver` (Zod 4 + @hookform/resolvers 5.4.0)
+  - `mode: "onBlur"` para validación temprana
+  - UX: iconos `Save`/`ArrowLeft`, loading state con `Loader2`
+  - 2 Cards: "Datos básicos" + "Datos opcionales"
+  - Selector visual de día de pago (botones 15/30 con estilo Alebrijes)
+  - Input `type="number"` con `step="0.01"` para monto
+- [x] 5.2.4 — Server action `createClienteAction` (existente en `lib/actions/clientes.ts`):
+  - Valida con `clienteSchema.safeParse`
+  - Inserta via service_role
+  - Maneja error `23505` (WhatsApp duplicado)
+  - `revalidatePath('/dashboard/clientes')` y `revalidatePath('/dashboard')`
+- [x] 5.2.5 — Submit:
+  - Llama server action
+  - `toast.success` en éxito
+  - `router.push('/dashboard/clientes')` + `router.refresh()`
+  - `setServerError` + `toast.error` en fallo
+- [x] 5.2.6 — Validación dual:
+  - **Cliente**: `zodResolver` con `mode: "onBlur"`
+  - **Servidor**: `clienteSchema.safeParse(input)` antes de insertar
+  - Mensajes de error se mapean a campos del form
+- [x] 5.2.7 — Commit: `feat(clientes): create form with Zod validation, react-hook-form and Alebrijes styling` (commit `7aa6440`)
+
+### Build status
+```
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/badges
+├ ƒ /dashboard
+├ ƒ /dashboard/clientes
+├ ƒ /dashboard/clientes/nuevo    ← NUEVA
+└ ○ /login
+ƒ Proxy (Middleware)
+```
+
+### Extras incluidos
+- 📦 **Nuevas deps**: `react-hook-form 7.80.0`, `@hookform/resolvers 5.4.0`
+- 🎨 **Selector visual de día**: 2 botones con estilo Alebrijes naranja (más visual que radio buttons)
+- 🔄 **Reutilizable**: el `ClienteForm` se usa también para `5.3 — Editar` (con `mode="edit"`)
+- ⚠️ **Cast `as never`** en zodResolver por incompatibilidad menor de tipos Zod 4 ↔ @hookform/resolvers 5 (build pasa OK)
 
 ### 5.3 — Editar cliente
 
