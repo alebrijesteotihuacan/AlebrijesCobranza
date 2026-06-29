@@ -6,6 +6,9 @@ import { getAdminClient } from "@/lib/queries/clientes";
 import { InfoPagoForm } from "@/components/configuracion/info-pago-form";
 import { PlantillasEditor, type Plantilla } from "@/components/configuracion/plantillas-editor";
 import { AccountInfo } from "@/components/configuracion/account-info";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Shield } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -48,6 +51,20 @@ export default async function ConfiguracionPage() {
       <PlantillasEditor plantillas={plantillas} />
 
       {/* Section 3: Account */}
+      <Link href="/dashboard/admin" className="block">
+        <Button
+          render={<Link href="/dashboard/admin" />}
+          variant="outline"
+          className="w-full justify-between"
+        >
+          <span className="flex items-center gap-2">
+            <Shield className="w-4 h-4" />
+            Gestionar administradores
+          </span>
+          <span className="text-xs text-muted-foreground">Invitar / desactivar</span>
+        </Button>
+      </Link>
+
       <AccountInfo
         email={user.email ?? null}
         nombre={(user.user_metadata?.nombre as string | undefined) ?? null}
