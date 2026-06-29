@@ -740,17 +740,52 @@ Route (app)
 
 ### 6.2 — Reportes
 
-- [ ] 6.2.1 — `app/(app)/dashboard/reportes/page.tsx`
-- [ ] 6.2.2 — Selector de mes/año
-- [ ] 6.2.3 — Tabla resumen del mes:
-  - [ ] 6.2.3.1 — Total clientes activos
-  - [ ] 6.2.3.2 — Total cobrado
-  - 6.2.3.3 — Total pendiente
-  - [ ] 6.2.3.3 — % de cobranza (cobrado/esperado)
-  - [ ] 6.2.3.4 — Lista de morosos con días de atraso
-- [ ] 6.2.4 — Gráfica de barras con `recharts`: cobrados vs pendientes por día de pago (15 vs 30)
-- [ ] 6.2.5 — (Opcional) Botón "Exportar CSV"
-- [ ] 6.2.6 — Commit: `feat(reportes): monthly summary with charts`
+- [x] 6.2.1 — `app/dashboard/reportes/page.tsx` (Server Component, dynamic, con `searchParams: Promise<{periodo?}>`)
+- [x] 6.2.2 — Selector de mes/año:
+  - `components/reportes/reporte-periodo-select.tsx` con shadcn `Select`
+  - 16 opciones (12 meses atrás + actual + 3 adelante)
+  - Navegación con `ChevronLeft` / `ChevronRight` (URL-driven)
+  - `formatPeriodoLabel` para mostrar "Junio 2026"
+- [x] 6.2.3 — Tabla resumen del mes (4 KPI cards):
+  - [x] 6.2.3.1 — **Total clientes activos** + count de pagaron
+  - [x] 6.2.3.2 — **Total cobrado** con % de cobranza (cobrado/esperado)
+  - [x] 6.2.3.3 — **Total esperado** (sum de monto de todos los clientes)
+  - [x] 6.2.3.4 — **Total pendiente** + count de morosos
+- [x] 6.2.3.4 — **Lista de morosos con días de atraso** (tabla con link al cliente, día, monto, badge atraso)
+- [x] 6.2.4 — Gráfica de barras con `recharts`:
+  - `components/reportes/cobranza-chart.tsx`
+  - 2 categorías: Día 15 y Día 30
+  - Stack de "Cobrado" (verde) + "Pendiente" (rojo)
+  - Responsive container, tooltip con formato MXN, grid y leyenda
+  - Eje Y formateado con `$X,XXX.XX`
+- [x] 6.2.5 — **Botón "Exportar CSV"**:
+  - `lib/queries/reportes.ts:buildCsvFromReporte()` genera CSV con secciones (Resumen, Por día, Morosos)
+  - Encoding UTF-8 con base64 data URL
+  - Nombre: `reporte-alebrijes-YYYY-MM.csv`
+  - CSV-escape para campos con comas/comillas
+- [x] 6.2.6 — Commit: `feat(reportes): monthly summary, cobranza chart, morosos list, CSV export` (commit `5624e06`)
+
+### Extras incluidos
+- 🛠️ **`lib/queries/reportes.ts`** con `getReporte(periodo)` + `buildCsvFromReporte(data)`:
+  - Cálculo correcto de morosos para meses pasados (todos los impagos) vs actual (solo los que ya pasaron)
+  - `Math.min(dia_pago, lastDayOfMonth)` para meses con <30 días
+  - Validación de `periodo` con regex `^\d{4}-(0[1-9]|1[0-2])$`
+  - Default a mes actual si periodo inválido
+- 📊 **Lógica de "atraso" contextual**:
+  - Mes pasado: atraso = días desde fin de mes
+  - Mes actual: atraso = `today - diaDelPago`
+  - Mes futuro: lista vacía
+- 🛠️ **`isValidPeriodo`** y **`sumSafe`** helpers
+- 📥 **CSV con secciones** comentadas (`#` al inicio)
+- 🎨 **Colores del chart** desde paleta Alebrijes
+- 📱 **Responsive**:
+  - Period selector y nav arrows en row en sm+, stacked en mobile
+  - Tabla de morosos con WhatsApp oculto en xs
+
+### Criterios de Salida Fase 6
+- [x] Dashboard muestra KPIs reales (`getDashboardKpis()` con queries paralelas)
+- [x] Reportes mensuales funcionales (selector + 4 KPIs + chart + morosos)
+- [x] Gráfica renderiza correctamente (recharts con ResponsiveContainer, tooltip formateado)
 
 ### Criterios de Salida Fase 6
 - [ ] Dashboard muestra KPIs reales
