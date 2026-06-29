@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, Shield } from "lucide-react";
+import { ChevronLeft, Shield, ScrollText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import { listAdmins } from "@/lib/queries/admin";
@@ -36,6 +36,16 @@ export default async function AdminPage() {
           Gestioná quién tiene acceso al dashboard
         </p>
       </div>
+
+      <Link href="/dashboard/admin/auditoria" className="block">
+        <Button variant="outline" className="w-full justify-between">
+          <span className="flex items-center gap-2">
+            <ScrollText className="w-4 h-4" />
+            Ver log de auditoría
+          </span>
+          <span className="text-xs text-muted-foreground">Acciones del admin</span>
+        </Button>
+      </Link>
 
       <InviteAdminForm />
 
