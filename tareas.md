@@ -1229,9 +1229,34 @@ Todos los datos de prueba fueron eliminados:
 
 ### 8.5 — Configurar Monitoreo Básico
 
-- [ ] 8.5.1 — En Supabase Dashboard → Logs, verificar que no hay errores recurrentes
-- [ ] 8.5.2 — Configurar alertas en Vercel (si plan Pro) o vigilar logs manualmente
-- [ ] 8.5.3 — Documentar procedimiento de rollback: redeploy de Vercel + `supabase functions deploy` con versión anterior
+- [x] 8.5.1 — **Verificado: no hay errores recurrentes**
+  - Query operacional ejecutada (2026-06-29):
+    - `pagos_fallidos_24h`: 0
+    - `pagos_exitosos_24h`: 0 (esperable, sin envíos reales por phone no verificado)
+    - `comprobantes_pendientes`: 0
+    - `desconocidos_7d`: 0
+  - Las 3 Edge Functions están en `v3`, todas `ACTIVE`
+  - Vercel: 5 deploys, todos `READY`, último `PROMOTED`
+  - 4 env vars de Vercel configuradas correctamente
+  - **Documentado en `docs/MONITORING.md`**: health checks curl, SQL queries operacionales, links a dashboards
+- [x] 8.5.2 — **Plan es Vercel Hobby (Free)**: NO hay alertas built-in
+  - **Documentado en `docs/MONITORING.md`**: opciones gratuitas de alerting:
+    - UptimeRobot / Pingdom (monitoreo HTTP + email alerts)
+    - Suscripción a GitHub notifications (push events en el repo)
+    - Checklist diario de 5 min para vigilar manualmente
+  - Plan Pro de Vercel ($20/mes) tendría alertas built-in, pero no es necesario aún
+- [x] 8.5.3 — **Procedimiento de rollback documentado en `docs/ROLLBACK.md`**
+  - **Escenario 1 — Vercel**: 1-click rollback via dashboard + CLI + API
+  - **Escenario 2 — Edge Functions**: `git checkout <commit> -- supabase/functions/` + redeploy (Supabase NO tiene rollback nativo)
+  - **Escenario 3 — DB migrations**: NO automatic rollback (forward-only), requiere nueva migración correctiva
+  - **Escenario 4 — Secrets de Meta**: revertir a secret anterior + redeploy de funciones
+  - Tiempos de rollback documentados (1-2 min para Vercel, 3-5 min para Functions)
+  - Tips de prevención + contactos de emergencia
+- [x] 8.5.4 — Commits: `81660fe` (inicial), `9f399d2` (clean re-commit sin token leaked)
+  - ⚠️ El token de Vercel fue detectado por GitHub push protection en el primer commit
+  - Se hizo `git reset --soft HEAD~2` + re-commit limpio + force push
+  - El token se removió de `ROLLBACK.md` (ahora se usa `VERCEL_TOKEN` env var)
+  - **Recomendación**: rotar el Vercel token en [vercel.com/account/tokens](https://vercel.com/account/tokens) ya que fue compartido en chat
 
 ### 8.6 — Documentación de Operación
 
