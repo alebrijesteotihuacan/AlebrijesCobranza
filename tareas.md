@@ -800,27 +800,42 @@ Route (app)
 
 ### 7.1 — Bandeja de Comprobantes
 
-- [ ] 7.1.1 — `app/(app)/dashboard/comprobantes/page.tsx`
-- [ ] 7.1.2 — Query: `comprobantes_recibidos where estado='pendiente' order by recibido_at desc`
-- [ ] 7.1.3 — Crear `components/comprobantes/comprobante-card.tsx`:
-  - [ ] 7.1.3.1 — Thumbnail del archivo:
-    - [ ] 7.1.3.1.1 — Si `tipo='image'` → mostrar `<img>` con signed URL
-    - [ ] 7.1.3.1.2 — Si `tipo='document'` → icono PDF + link "Ver PDF"
-    - [ ] 7.1.3.1.3 — Si `tipo='text'` → mostrar el texto
-  - [ ] 7.1.3.2 — Datos del cliente (nombre, whatsapp, día de pago, monto)
-  - [ ] 7.1.3.3 — Texto del mensaje (caption)
-  - [ ] 7.1.3.4 — Fecha de recepción (formato: "Hace 2h")
-  - [ ] 7.1.3.5 — Botones "Validar" y "Rechazar"
-- [ ] 7.1.4 — Generar signed URL temporal (15 min) server-side:
-  ```ts
-  const { data } = await supabase.storage
-    .from('comprobantes')
-    .createSignedUrl(storage_path, 900);
-  ```
-- [ ] 7.1.5 — Crear `components/comprobantes/comprobante-viewer.tsx`:
-  - [ ] 7.1.5.1 — Modal/dialog con imagen grande o PDF embebido
-  - [ ] 7.1.5.2 — Botón cerrar
-- [ ] 7.1.6 — Commit: `feat(comprobantes): inbox with thumbnails`
+- [x] 7.1.1 — `app/dashboard/comprobantes/page.tsx` (Server Component, dynamic, con `searchParams: Promise<{estado?}>`)
+- [x] 7.1.2 — Query: `getComprobantesByEstado(estado, limit=100)` en `lib/queries/comprobantes.ts`:
+  - Filtra por estado (default: `pendiente`)
+  - Ordena por `recibido_at desc`
+  - **Hidrata cliente** (id, nombre, whatsapp, dia_pago, monto, activo) con una query batch
+  - **Genera signed URLs** (15 min) por cada comprobante con `attachSignedUrl()`
+- [x] 7.1.3 — `components/comprobantes/comprobante-card.tsx` con:
+  - [x] 7.1.3.1.1 — Si `tipo='image'` → `<img>` con signed URL (object-cover)
+  - [x] 7.1.3.1.2 — Si `tipo='document'` → icono `FileText` + "PDF" + botón "Abrir" en nueva tab
+  - [x] 7.1.3.1.3 — Si `tipo='text'` → preview italic del texto
+  - [x] 7.1.3.2 — Datos del cliente: nombre link a `/clientes/[id]`, WhatsApp, día, monto
+  - [x] 7.1.3.3 — Caption como blockquote si existe y no es el preview principal
+  - [x] 7.1.3.4 — `formatRelativeTime(c.recibido_at)` → "Hace 2h"
+  - [x] 7.1.3.5 — Botones "Rechazar" (outline red) y "Validar" (success)
+- [x] 7.1.4 — Signed URL server-side con `supabase.storage.createSignedUrl(path, 900)` (15 min)
+- [x] 7.1.5 — `components/comprobantes/comprobante-viewer.tsx`:
+  - [x] 7.1.5.1 — Modal/Dialog con `<img>` grande (image) o `<iframe>` (document PDF)
+  - [x] 7.1.5.2 — Botón cerrar + botón "Descargar" (signed URL directo)
+  - Loading state con `Loader2`
+- [x] 7.1.6 — `ValidarDialog` + `RechazarDialog`:
+  - **Validar**: confirma, crea `pago` (upsert), marca `validado`, borra file de Storage, envía WhatsApp `pago_validado`
+  - **Rechazar**: pide motivo, marca `rechazado`, borra file, envía WhatsApp `pago_rechazado`
+- [x] 7.1.7 — Filtros por estado (Tabs: Todos / Pendientes / Validados / Rechazados) con URL-driven state
+- [x] 7.1.8 — Commit: `feat(comprobantes): inbox with thumbnails, validar/rechazar dialogs, signed URLs` (commit `75dd955`)
+
+### Extras incluidos
+- 🔐 **Seguridad**: signed URLs con expiración 15min, sin URLs públicas
+- 🗑️ **Borrado automático** de archivos al validar/rechazar (cumple política "no acumular")
+- 📱 **Responsive**: card vertical en mobile, horizontal en sm+ con thumbnail 48x48
+- 🎨 **3 estados visuales**: warning (pendiente), success (validado), danger (rechazado)
+- 📋 **Tabs como pills** con count badges
+- 🛠️ **Server actions robustas** con manejo de WhatsApp opcional (`error` reportado pero no fatal)
+- 🔄 **4 revalidatePath** en validar: comprobantes, dashboard, reportes, cliente
+- 📊 **KPIs clickeables** que filtran por estado
+- 🎯 **Default periodo** automático al mes actual
+- ⚠️ **Validación de estado** en server action (rechaza si ya fue validado/rechazado)
 
 ### 7.2 — Acción Validar
 
