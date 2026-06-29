@@ -1162,21 +1162,42 @@ Route (app)
 
 > **Tiempo: 30+ min (cada item es independiente)**
 
-- [ ] 9.1 — **Loading states** con skeletons de shadcn en todas las páginas
-- [ ] 9.2 — **Toasts de éxito/error** consistentes en todas las acciones
-- [ ] 9.3 — **Confirmaciones de borrado** (Dialog con "¿Estás seguro?")
-- [ ] 9.4 — **Modo oscuro** con toggle (paleta adaptada)
-- [ ] 9.5 — **Exportar reporte mensual a CSV**
-- [ ] 9.6 — **Gráficas adicionales** en reportes (evolución mensual, distribución de morosidad)
-- [ ] 9.7 — **Búsqueda global** en el topbar (clientes, mensajes, etc.)
-- [ ] 9.8 — **Notificaciones en el navegador** cuando hay comprobantes nuevos (Web Push API)
-- [ ] 9.9 — **Auditoría**: tabla `audit_log` que registra cada acción del admin
-- [ ] 9.10 — **Multi-admin**: invitar a más personas con Supabase Auth
-- [ ] 9.11 — **Plantillas de Meta pre-aprobadas** para cobranza (utility template) si los `text` directos son rechazados
-- [ ] 9.12 — **Tests automatizados** (Vitest + Playwright)
-- [ ] 9.13 — **CI/CD** con GitHub Actions (lint + typecheck + test en cada PR)
-- [ ] 9.14 — **Internacionalización** (i18n) por si se quiere usar en otro equipo
-- [ ] 9.15 — **PWA** para instalar como app nativa en el celular del admin
+### Items ya completados (existentes en código) ✅
+
+- [x] 9.2 — **Toasts de éxito/error** consistentes → `sonner` configurado en `app/layout.tsx` + **19 usos de `toast.success/error/warning`** en componentes (verificado con grep)
+- [x] 9.3 — **Confirmaciones de borrado** → Dialogs de confirmación implementados para soft-delete (clientes), desactivar, rechazar comprobantes
+- [x] 9.5 — **Exportar reporte mensual a CSV** → `buildCsvFromReporte()` en `lib/queries/reportes.ts` + botón "Exportar CSV" en página de reportes (Fase 6.2)
+- [x] 9.11 — **Plantillas de Meta** → Documentado en `OPERATIONS.md` sección 4 (cómo editarlas desde el dashboard)
+
+### Items completados en esta sesión ✅
+
+- [x] 9.4 — **Modo oscuro con toggle** (commit `ba8098c`)
+  - `components/theme-toggle.tsx`: Client component con iconos Moon/Sun
+  - Persiste en `localStorage` (key `alebrijes-theme`) con fallback a `prefers-color-scheme`
+  - Script inline en `<head>` para evitar FOUC (flash of light theme)
+  - CSS vars ya estaban definidas en `.dark` (Fase 1.4)
+  - Toggle agregado al Topbar (izquierda del dropdown de usuario)
+- [x] 9.6 — **Gráficas adicionales: evolución mensual** (commit `ba8098c`)
+  - `components/reportes/monthly-evolution-chart.tsx`: BarChart apilado de día 15 vs día 30
+  - `getMonthlyPayments(months=6)` en `lib/queries/reportes.ts`: agrupa pagos por periodo + dia_pago del cliente
+  - Empty state cuando no hay pagos
+  - Integrada en `reportes/page.tsx` entre chart por día y tabla de morosos
+
+### Items pendientes para próximas sesiones 🕐
+
+- [ ] 9.1 — **Loading states** con skeletons de shadcn en todas las páginas (10+ páginas)
+- [ ] 9.7 — **Búsqueda global** en el topbar (clientes, mensajes, comprobantes)
+- [ ] 9.8 — **Notificaciones en el navegador** (Web Push API) — requiere service worker + VAPID
+- [ ] 9.9 — **Auditoría**: tabla `audit_log` con triggers
+- [ ] 9.10 — **Multi-admin**: UI para invitar/desactivar admins
+- [ ] 9.12 — **Tests automatizados** (Vitest + Playwright) — gran esfuerzo
+- [ ] 9.13 — **CI/CD** con GitHub Actions
+- [ ] 9.14 — **Internacionalización** (i18n) — gran esfuerzo
+- [ ] 9.15 — **PWA** para instalar como app nativa
+
+### Commits
+- `ba8098c` — feat(9.4,9.6): dark mode toggle + monthly evolution chart
+- 6 archivos cambiados, 297 líneas añadidas
 
 ---
 
