@@ -4,6 +4,7 @@ import { getPagosByCliente, getMensajesByCliente } from "@/lib/queries/pagos";
 import { ClienteForm } from "@/components/clientes/cliente-form";
 import { HistorialPagos } from "@/components/clientes/historial-pagos";
 import { MensajesTimeline } from "@/components/clientes/mensajes-timeline";
+import { QuickActions } from "@/components/clientes/quick-actions";
 import { Badge } from "@/components/ui/badge";
 
 export const dynamic = "force-dynamic";
@@ -24,7 +25,7 @@ export default async function EditarClientePage({ params }: PageProps) {
 
   return (
     <div className="space-y-6 max-w-5xl">
-      {/* Status badge */}
+      {/* Status banner */}
       {!cliente.activo && (
         <div className="rounded-md bg-zinc-100 border border-zinc-200 p-3 text-sm flex items-center gap-2">
           <Badge variant="secondary">Inactivo</Badge>
@@ -34,7 +35,10 @@ export default async function EditarClientePage({ params }: PageProps) {
         </div>
       )}
 
-      {/* Form */}
+      {/* Quick actions bar */}
+      <QuickActions cliente={cliente} />
+
+      {/* Edit form */}
       <ClienteForm mode="edit" cliente={cliente} />
 
       {/* Side info */}
