@@ -7,9 +7,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ComprobanteCard } from "@/components/comprobantes/comprobante-card";
+import { DateRangeFilter } from "@/components/comprobantes/date-range-filter";
 import {
   getComprobantesByEstado,
   getComprobantesKpis,
@@ -22,15 +22,27 @@ import { formatPeriodoLabel } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 interface PageProps {
-  searchParams: Promise<{ estado?: ComprobanteEstado | "todos" }>;
+  searchParams: Promise<{
+    estado?: ComprobanteEstado | "todos";
+    from?: string;
+    to?: string;
+  }>;
 }
 
 export default async function ComprobantesPage({ searchParams }: PageProps) {
-  const { estado = "pendiente" } = await searchParams;
+  const { estado = "pendiente", from, to } = await searchParams;
+
+  // For the "pendiente" tab, we don't apply the date filter (we want to see all pending)
+  // For "validado" and "rechazado", the date filter is useful
+  const opts: { from?: string; to?: string } = {};
+  if (estado !== "pendiente") {
+    if (from) opts.from = from;
+    if (to) opts.to = to;
+  }
 
   const [kpis, comprobantes, periodos] = await Promise.all([
     getComprobantesKpis(),
-    getComprobantesByEstado(estado, 100),
+    getComprobantesByEstado(estado, { ...opts, limit: 100 }),
     getComprobantesPeriodoOptions(),
   ]);
   const defaultPeriodo = getCurrentPeriodo();
@@ -62,9 +74,14 @@ export default async function ComprobantesPage({ searchParams }: PageProps) {
         <EstadoTab href="/dashboard/comprobantes?estado=rechazado" label="Rechazados" count={kpis.rechazados} active={estado === "rechazado"} tone="danger" />
       </div>
 
+      {/* 7.4.3 — Filtro por rango de fechas (solo para validados/rechazados) */}
+      {estado !== "pendiente" && (
+        <DateRangeFilter />
+      )}
+
       {/* Lista */}
       {comprobantes.length === 0 ? (
-        <EmptyState estado={estado} />
+        <EmptyState estado={estado} hasDateFilter={!!(from || to)} />
       ) : (
         <div className="space-y-3">
           {comprobantes.map((c) => (
@@ -157,7 +174,7 @@ function EstadoTab({
   );
 }
 
-function EmptyState({ estado }: { estado: ComprobanteEstado | "todos" }) {
+function EmptyState({ estado, hasDateFilter }: { estado: ComprobanteEstado | "todos"; hasDateFilter: boolean }) {
   const messages: Record<string, { title: string; description: string; icon: typeof Clock }> = {
     pendiente: {
       title: "Sin comprobantes pendientes",
@@ -165,13 +182,17 @@ function EmptyState({ estado }: { estado: ComprobanteEstado | "todos" }) {
       icon: CheckCircle2,
     },
     validado: {
-      title: "Aún no hay comprobantes validados",
-      description: "Cuando valides un comprobante aparecerá aquí.",
+      title: hasDateFilter ? "Sin resultados en este rango" : "Aún no hay comprobantes validados",
+      description: hasDateFilter
+        ? "Intenta con otro rango de fechas o limpia el filtro."
+        : "Cuando valides un comprobante aparecerá aquí.",
       icon: CheckCircle2,
     },
     rechazado: {
-      title: "Sin comprobantes rechazados",
-      description: "Cuando rechaces un comprobante aparecerá aquí.",
+      title: hasDateFilter ? "Sin resultados en este rango" : "Sin comprobantes rechazados",
+      description: hasDateFilter
+        ? "Intenta con otro rango de fechas o limpia el filtro."
+        : "Cuando rechaces un comprobante aparecerá aquí.",
       icon: XCircle,
     },
     todos: {

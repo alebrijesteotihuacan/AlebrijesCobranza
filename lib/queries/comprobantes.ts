@@ -49,8 +49,9 @@ async function attachSignedUrl(c: Comprobante, expiresIn = 900): Promise<Comprob
 
 export async function getComprobantesByEstado(
   estado: ComprobanteEstado | "todos" = "pendiente",
-  limit = 100,
+  opts: { limit?: number; from?: string; to?: string } = {},
 ): Promise<ComprobanteWithRelations[]> {
+  const { limit = 100, from, to } = opts;
   const admin = getAdminClient();
   let q = admin
     .from("comprobantes_recibidos")
@@ -58,6 +59,8 @@ export async function getComprobantesByEstado(
     .order("recibido_at", { ascending: false })
     .limit(limit);
   if (estado !== "todos") q = q.eq("estado", estado);
+  if (from) q = q.gte("recibido_at", from);
+  if (to) q = q.lte("recibido_at", to);
   const { data, error } = await q;
   if (error) {
     console.error("getComprobantesByEstado error", error);
