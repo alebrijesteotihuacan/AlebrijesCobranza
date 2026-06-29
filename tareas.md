@@ -648,24 +648,37 @@ Route (app)
 
 ### 5.4 — Marcar como pagado (sin comprobante)
 
-- [ ] 5.4.1 — En `/clientes/[id]`, botón "Marcar como pagado"
-- [ ] 5.4.2 — Abre `<PagoModal />` con:
-  - [ ] 5.4.2.1 — Selector de periodo (`YYYY-MM`, default: mes actual)
-  - [ ] 5.4.2.2 — Campo de monto (default: monto del cliente)
-  - [ ] 5.4.2.3 — Campo de método (default: "manual")
-  - [ ] 5.4.2.4 — Campo de notas opcional
-- [ ] 5.4.3 — Submit → server action `registrarPago()`:
-  - [ ] 5.4.3.1 — Verificar que no exista pago duplicado (mismo cliente, mismo periodo)
-  - [ ] 5.4.3.2 — Insert en `pagos`
-  - [ ] 5.4.3.3 — Toast éxito
-  - [ ] 5.4.3.4 — Refresh de la página
-- [ ] 5.4.4 — Commit: `feat(clientes): mark as paid without receipt`
+- [x] 5.4.1 — Botón "Marcar como pagado" en `/clientes/[id]`:
+  - Creado `components/clientes/quick-actions.tsx` con barra de acciones rápidas
+  - 3 acciones: Registrar pago (primary), WhatsApp (link wa.me), Activar/Desactivar
+- [x] 5.4.2 — `PagoFormDialog` (creado en Fase 5.3) con:
+  - [x] 5.4.2.1 — Selector de periodo (`YYYY-MM`, default: `getCurrentPeriodo()`)
+  - [x] 5.4.2.2 — Campo de monto (default: `defaultMonto` del cliente, type="number" step="0.01")
+  - [x] 5.4.2.3 — Campo de método (default: "manual")
+  - [x] 5.4.2.4 — Campo de notas opcional
+- [x] 5.4.3 — Server action `registrarPagoAction`:
+  - [x] 5.4.3.1 — Validación de duplicado:
+    - **DB-level**: `unique (cliente_id, periodo)` constraint
+    - **App-level**: Zod schema + manejo de error `23505` con mensaje amigable
+  - [x] 5.4.3.2 — Insert en `pagos` con `service_role`
+  - [x] 5.4.3.3 — Toast de éxito (Sonner)
+  - [x] 5.4.3.4 — `revalidatePath` en `/dashboard/clientes`, `/dashboard/clientes/[id]` y `/dashboard`
+- [x] 5.4.4 — Commit: `feat(clientes): add quick actions bar with mark-as-paid button on /clientes/[id]` (commit `91c1669`)
+
+### Extras incluidos
+- 🎨 **QuickActions bar** con 3 botones: Pagar, WhatsApp, Desactivar/Reactivar
+- 💬 **Link wa.me/<whatsapp>** directo para abrir chat de WhatsApp
+- 🧪 **Tests E2E via PostgREST** (verificación del dedupe):
+  - Primer pago (2026-06): **HTTP 201 Created** ✓
+  - Duplicado (mismo cliente+periodo): **HTTP 409 Conflict** + error `23505` ✓
+  - Periodo diferente (2026-07): **HTTP 201 Created** ✓
+- 🛡️ **Doble validación**: client (Zod) + server (Zod) + DB (unique constraint)
 
 ### Criterios de Salida Fase 5
-- [ ] CRUD completo de clientes funcional
-- [ ] Validación Zod en cliente y servidor
-- [ ] Búsqueda y filtros básicos
-- [ ] Pago manual registrable
+- [x] CRUD completo de clientes funcional: list, create, edit, soft-delete, activate/reactivate
+- [x] Validación Zod en cliente y servidor (`clienteSchema`, `pagoSchema`)
+- [x] Búsqueda y filtros básicos (search por nombre/WhatsApp/categoría + paginación 20/pág)
+- [x] Pago manual registrable (con dedupe verificado E2E)
 
 ---
 
