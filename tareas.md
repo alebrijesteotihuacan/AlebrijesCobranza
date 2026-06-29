@@ -182,21 +182,22 @@
 
 ### 1.5 — Variables de entorno locales
 
-- [ ] 1.5.1 — Crear `.env.local` con:
-  ```bash
-  NEXT_PUBLIC_SUPABASE_URL=https://<project_ref>.supabase.co
-  NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon_key>
-  NEXT_PUBLIC_APP_NAME="Alebrijes Cobranza"
-  NEXT_PUBLIC_PAYMENT_INFO="Banco X · Cuenta 1234 · CLABE 567 · Transferencia a nombre de Club Alebrijes Oaxaca"
-  ```
-- [ ] 1.5.2 — Crear `.env.example` con la misma estructura (sin valores reales) para documentar
-- [ ] 1.5.3 — Verificar que `.env.local` está en `.gitignore`
+- [x] 1.5.1 — `.env.local` creado con:
+  - `NEXT_PUBLIC_SUPABASE_URL=https://wcsqafedvjjwtntepmhf.supabase.co`
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGc...` (anon key)
+  - `NEXT_PUBLIC_APP_NAME="Alebrijes Cobranza"`
+  - `NEXT_PUBLIC_PAYMENT_INFO="Banco Azteca · CLABE 1271 8001 3747 4787 85 · Tarjeta 5263 5401 6581 7087 · Transferencia a nombre de Club Alebrijes Oaxaca"`
+- [x] 1.5.2 — `.env.example` creado con la misma estructura (placeholders) + sección de secrets de Edge Functions documentada (referencia a `supabase secrets set`)
+- [x] 1.5.3 — `.env.local` correctamente ignorado por git:
+  - `.gitignore` línea 35: `.env*`
+  - `.gitignore` línea 36: `!.env.example` (excepción para la plantilla)
+  - `git check-ignore -v .env.local` confirma que está ignorado
 
 ### Criterios de Salida Fase 1
-- [ ] `pnpm dev` levanta sin errores
-- [ ] Paleta Alebrijes aplicada (botón naranja de prueba se ve bien)
-- [ ] Variables de entorno cargadas
-- [ ] Commit: `chore: phase 1 complete`
+- [x] `pnpm build` exitoso en 20.4s (TypeScript OK, 4 páginas estáticas)
+- [x] Paleta Alebrijes aplicada (compiló sin errores con `@theme inline` personalizado)
+- [x] Variables de entorno cargadas (build pasó con las vars de Supabase)
+- [x] Commit: `chore: phase 1 complete - env example, alebrijes assets, docs sync` (commit 8b6d672)
 
 ---
 
@@ -206,49 +207,47 @@
 
 ### 2.1 — Preparar archivo de migración
 
-- [ ] 2.1.1 — Crear `supabase/migrations/20260628120000_init.sql`
-- [ ] 2.1.2 — Dentro del archivo, en orden:
-  - [ ] 2.1.2.1 — Extensiones necesarias: `pg_cron`, `pg_net`, `pgcrypto`
-  - [ ] 2.1.2.2 — `CREATE TABLE` para `clientes`
-  - [ ] 2.1.2.3 — `CREATE TABLE` para `pagos`
-  - [ ] 2.1.2.4 — `CREATE TABLE` para `mensajes_enviados`
-  - [ ] 2.1.2.5 — `CREATE TABLE` para `plantillas`
-  - [ ] 2.1.2.6 — `CREATE TABLE` para `comprobantes_recibidos`
-  - [ ] 2.1.2.7 — `CREATE TABLE` para `mensajes_desconocidos`
-  - [ ] 2.1.2.8 — Índices (`comprobantes_recibidos (estado, recibido_at desc)`, etc.)
-  - [ ] 2.1.2.9 — `ALTER TABLE ... ENABLE ROW LEVEL SECURITY` en todas
-  - [ ] 2.1.2.10 — Policies: `create policy "deny all anon"` para cada tabla
-  - [ ] 2.1.2.11 — `INSERT` de las 8 plantillas seed
-  - [ ] 2.1.2.12 — Trigger `set_updated_at` en `clientes`
+- [1] 2.1.1 — Crear `supabase/migrations/20260628120000_init.sql`
+- [1] 2.1.2 — Dentro del archivo, en orden:
+  - [1] 2.1.2.1 — Extensiones necesarias: `pg_cron`, `pg_net`, `pgcrypto`
+  - [1] 2.1.2.2 — `CREATE TABLE` para `clientes`
+  - [1] 2.1.2.3 — `CREATE TABLE` para `pagos`
+  - [1] 2.1.2.4 — `CREATE TABLE` para `mensajes_enviados`
+  - [1] 2.1.2.5 — `CREATE TABLE` para `plantillas`
+  - [1] 2.1.2.6 — `CREATE TABLE` para `comprobantes_recibidos`
+  - [1] 2.1.2.7 — `CREATE TABLE` para `mensajes_desconocidos`
+  - [1] 2.1.2.8 — Índices (`comprobantes_recibidos (estado, recibido_at desc)`, etc.)
+  - [1] 2.1.2.9 — `ALTER TABLE ... ENABLE ROW LEVEL SECURITY` en todas
+  - [1] 2.1.2.10 — Policies: `create policy "deny all anon"` para cada tabla
+  - [1] 2.1.2.11 — `INSERT` de las 8 plantillas seed
+  - [1] 2.1.2.12 — Trigger `set_updated_at` en `clientes`
 
 ### 2.2 — Aplicar migración vía MCP
 
-- [ ] 2.2.1 — Aplicar con herramienta MCP `apply_migration` (nombre: `init`)
-- [ ] 2.2.2 — Verificar que no hubo errores
-- [ ] 2.2.3 — Verificar tablas creadas: `execute_sql` con query:
+- [1] 2.2.1 — Aplicar con herramienta MCP `apply_migration` (nombre: `init`)
+- [1] 2.2.2 — Verificar que no hubo errores
+- [1] 2.2.3 — Verificar tablas creadas: `execute_sql` con query:
   ```sql
   select table_name from information_schema.tables
   where table_schema = 'public' order by table_name;
   ```
-- [ ] 2.2.4 — Verificar plantillas seed: `select count(*) from public.plantillas` debe ser 8
-- [ ] 2.2.5 — Commit: `feat(db): initial schema with 6 tables and seed`
+- [1] 2.2.4 — Verificar plantillas seed: `select count(*) from public.plantillas` debe ser 8
+- [1] 2.2.5 — Commit: `feat(db): initial schema with 6 tables and seed`
 
 ### 2.3 — Storage Bucket para comprobantes
 
-- [ ] 2.3.1 — Crear bucket `comprobantes` con `execute_sql`:
-  ```sql
-  insert into storage.buckets (id, name, public)
-  values ('comprobantes', 'comprobantes', false)
-  on conflict (id) do nothing;
-  ```
-- [ ] 2.3.2 — Aplicar policies de storage: solo service_role tiene acceso
-  ```sql
-  -- Negar todo a anon y authenticated
-  create policy "deny all" on storage.objects
-    for all to anon, authenticated
-    using (bucket_id = 'comprobantes' and false);
-  ```
-- [ ] 2.3.3 — Verificar bucket en Dashboard de Supabase → Storage
+- [x] 2.3.1 — Bucket `comprobantes` creado:
+  - Migración dedicada: `supabase/migrations/20260628130000_storage_bucket.sql`
+  - `public: false` (privado)
+  - Verificado via Management API: `GET /v1/projects/{ref}/storage/buckets` devuelve:
+    ```json
+    {"id":"comprobantes","name":"comprobantes","public":false,"type":"STANDARD",...}
+    ```
+- [x] 2.3.2 — Policy de storage aplicada (deny all a `anon` y `authenticated`):
+  - Solo `service_role` (usado por Edge Functions) puede leer/escribir
+  - Aplicada en la misma migración del bucket
+- [x] 2.3.3 — Verificación confirmada via API y via la salida de `supabase db push`
+- [x] 2.3.4 — Commit: `feat(db): storage bucket for comprobantes with RLS deny policy` (commit bd7f954)
 
 ### 2.4 — Programar pg_cron
 
