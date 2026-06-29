@@ -305,23 +305,32 @@
 
 ### 3.2 — Función `enviar-mensaje`
 
-- [ ] 3.2.1 — Crear `supabase/functions/enviar-mensaje/index.ts`
-- [ ] 3.2.2 — Validar body: `{ cliente_id, plantilla_id, variables: {} }`
-- [ ] 3.2.3 — Cargar plantilla desde `plantillas` por ID
-- [ ] 3.2.4 — Renderizar variables con regex: `/\{\{(\w+)\}\}/g` → reemplazar con `variables[key]` o `cliente[key]`
-- [ ] 3.2.5 — POST a Meta API: `https://graph.facebook.com/v19.0/{PHONE_ID}/messages`
+- [x] 3.2.1 — Creado `supabase/functions/enviar-mensaje/index.ts` (247 líneas, Deno)
+- [x] 3.2.2 — Body validado: `{ cliente_id, plantilla_id, variables?, periodo?, offset_dias? }`
+  - `cliente_id` validado con regex UUID
+  - `plantilla_id` requerido (string)
+- [x] 3.2.3 — Plantilla cargada desde `public.plantillas` por `id` (con `maybeSingle` y `activo` check)
+- [x] 3.2.4 — Render con regex `/\{\{\s*(\w+)\s*\}\}/g` → busca en contexto (variables del body + datos del cliente + periodo + info_pago). Fallback al placeholder si falta
+- [x] 3.2.5 — POST a `https://graph.facebook.com/v19.0/{PHONE_ID}/messages` con:
   ```json
   {
     "messaging_product": "whatsapp",
     "to": "<whatsapp>",
     "type": "text",
-    "text": { "body": "<rendered>" }
+    "text": { "body": "<rendered>", "preview_url": false }
   }
   ```
-- [ ] 3.2.6 — Si responde 200: insert en `mensajes_enviados` con estado `enviado` y `whatsapp_message_id`
-- [ ] 3.2.7 — Si falla: insert con estado `fallido` y `error`
-- [ ] 3.2.8 — Retornar `{ ok, message_id, error }`
-- [ ] 3.2.9 — Commit: `feat(functions): generic send-message function`
+  Headers: `Authorization: Bearer <token>`, `Content-Type: application/json`
+- [x] 3.2.6 — Si responde 200: `upsert` en `mensajes_enviados` con `estado='enviado'` y `whatsapp_message_id` (dedupe por `cliente_id, periodo, offset_dias`)
+- [x] 3.2.7 — Si falla: `upsert` con `estado='fallido'` y `error` (mensaje de Meta API)
+- [x] 3.2.8 — Retorna `{ ok, message_id, error, rendered_preview, cliente, plantilla, periodo }`
+- [x] 3.2.9 — Commit: `feat(functions): generic send-message function with template rendering` (commit `3eb1f29`)
+
+### Extras incluidos
+- 🌍 Periodo auto-calculado en `America/Mexico_City` con `Intl.DateTimeFormat`
+- 🛡️ Manejo de errores robusto: cliente no existe, plantilla inactiva, Meta API errors
+- 📊 Dedupe via unique constraint (cliente_id, periodo, offset_dias) — no se duplican logs
+- 📨 Default info de pago si env no está seteada
 
 ### 3.3 — Función `enviar-recordatorios`
 
