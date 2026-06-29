@@ -961,11 +961,46 @@ Route (app)
 
 ### 7.6 — Mensajes Enviados (log)
 
-- [ ] 7.6.1 — `app/(app)/dashboard/mensajes/page.tsx`
-- [ ] 7.6.2 — Tabla con: Cliente, Plantilla, Periodo, Offset, Estado, Fecha
-- [ ] 7.6.3 — Filtros: cliente, periodo, estado
-- [ ] 7.6.4 — Paginación
-- [ ] 7.6.5 — Commit: `feat(mensajes): sent messages log`
+- [x] 7.6.1 — `app/dashboard/mensajes/page.tsx` (Server Component, dynamic, con `searchParams: Promise<{...}>`)
+- [x] 7.6.2 — Tabla con todas las columnas requeridas:
+  - **Cliente** (nombre + WhatsApp en font-mono)
+  - **Plantilla** (id font-mono)
+  - **Periodo** (font-mono, oculto en mobile)
+  - **Offset** (badge con label: "-3d", "hoy", "+1d", etc.)
+  - **Estado** (Badge verde "Enviado" o botón rojo colapsable "Fallido" con error expandible)
+  - **Fecha** relativa (formatRelativeTime)
+- [x] 7.6.3 — Filtros:
+  - **Cliente**: Select con búsqueda integrada (max 80vh de altura, scrollable)
+  - **Periodo**: Select con periodos dinámicos desde la DB
+  - **Estado**: Select (todos / enviados / fallidos)
+  - **Rango fechas**: dos `<Input type="date">` (from/to) con validación min/max
+  - URL-driven: `?cliente=...&periodo=...&estado=...&from=...&to=...&page=...`
+  - Botón "Limpiar filtros" cuando hay alguno activo
+- [x] 7.6.4 — Paginación:
+  - 25 mensajes por página
+  - Botones "Anterior" / "Siguiente" con `ChevronLeft/Right`
+  - Indicador "X mensajes · página N de M"
+  - Reset automático a página 1 cuando cambian los filtros
+- [x] 7.6.5 — Commit: `feat(mensajes): sent messages log with filters and pagination` (commit `76d5200`)
+
+### Extras incluidos
+- 🛠️ **`lib/queries/mensajes-enviados.ts`** con:
+  - `getMensajesEnviados(filtros, {limit, offset})` con `range(offset, offset+limit-1)`
+  - `countMensajesEnviados(filtros)` con `count: 'exact'`
+  - `getMensajesKpis()` con cálculo en memoria de enviados/fallidos/24h
+  - `getPeriodosFromMensajes(12)` con `Set` para dedupe
+- 📊 **4 KPI cards**: Total / Enviados / Fallidos (highlight rojo si >0) / Últimas 24h
+- 🔍 **Búsqueda en dropdown de cliente** con `Search` icon y filtrado live
+- 🎨 **Badges semánticos** con colores Alebrijes
+- 📜 **Collapsible error** (Collapsible de shadcn) — expandible para ver error completo
+- 🏷️ **Offset labels** humanizados: "-3d", "hoy", "+1d", "validado", "rechazado"
+- 🔍 **Empty state contextual**: "Sin resultados con los filtros" vs "Aún no se han enviado"
+- 📱 **Responsive**:
+  - Filtros en grid 1/2/4 cols según breakpoint
+  - Tabla con scroll horizontal
+  - Columna "Periodo" oculta en mobile
+- 🔄 **URL-driven** todos los filtros, recargar página mantiene estado
+- 🎯 **Server-side filtering + pagination** (no client-side)
 
 ### 7.7 — Configuración
 
