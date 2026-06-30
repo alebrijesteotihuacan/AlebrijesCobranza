@@ -19,6 +19,7 @@
 - [📩 FASE 7 — Comprobantes, Desconocidos, Mensajes y Configuración](#-fase-7--comprobantes-desconocidos-mensajes-y-configuración)
 - [🚀 FASE 8 — Deploy y Configuración Final en Meta](#-fase-8--deploy-y-configuración-final-en-meta)
 - [✨ FASE 9 — Pulido Opcional](#-fase-9--pulido-opcional)
+- [🔄 Migración a 3ra Cuenta de Meta](#-migración-a-3ra-cuenta-de-meta)
 - [🧪 Smoke Tests Finales](#-smoke-tests-finales)
 - [📋 Checklist de Entrega](#-checklist-de-entrega)
 
@@ -1230,6 +1231,55 @@ Route (app)
 ### Commits
 - `ba8098c` — feat(9.4,9.6): dark mode toggle + monthly evolution chart
 - 6 archivos cambiados, 297 líneas añadidas
+
+---
+
+## 🔄 Migración a 3ra Cuenta de Meta
+
+> **Fecha:** 30-Jun-2026
+> **Motivo:** La 2da cuenta de Meta (desarrollador anónimo) fue baneada sin explicación. Se migró a una cuenta creada por el dueño del club.
+
+### Credenciales Finales
+
+| Recurso | Valor |
+|---------|-------|
+| WABA ID | `217577751666224` |
+| Phone Number ID | `1111071985433084` |
+| Meta App ID | `1330791642575733` |
+| Meta App Secret | `ccc8ca12cb7f8e7741fc8ae6a4dfe60b` |
+| WhatsApp Token | `EAAEmVbMAmk4BOZB...` (cadena larga, 183 chars) |
+| Verify Token | `CobranzaAlebrijes2026` (sin cambios) |
+| Phone Status | `CONNECTED` ✅ |
+
+### Pasos Realizados
+
+- [x] M.1 — Crear nueva app en Meta for Developers (`1330791642575733`)
+- [x] M.2 — Agregar producto WhatsApp en la app
+- [x] M.3 — Crear WABA (`217577751666224`) desde Business Portfolio del dueño
+- [x] M.4 — Generar token permanente de WhatsApp (System User con `whatsapp_business_messaging` + `whatsapp_business_management`)
+- [x] M.5 — Configurar Webhook en Meta: URL + Verify Token + suscripción a `messages`
+- [x] M.6 — Verificar número de teléfono (`1111071985433084`) — **estatus: CONNECTED** ✅
+- [x] M.7 — Actualizar secrets en Supabase:
+  - `WHATSAPP_TOKEN` ✅ (nuevo)
+  - `WHATSAPP_APP_SECRET` ✅ (nuevo)
+  - `WHATSAPP_PHONE_NUMBER_ID` ✅ (nuevo)
+  - `WHATSAPP_WABA_ID` ✅ (nuevo)
+  - `WHATSAPP_WEBHOOK_VERIFY_TOKEN` 🔒 (sin cambios = `CobranzaAlebrijes2026`)
+- [x] M.8 — Redeploy Edge Functions: `whatsapp-webhook`, `enviar-mensaje`, `enviar-recordatorios`
+- [x] M.9 — **Test de Smoke POST** (HMAC-signed):
+  - POST con firma HMAC-SHA256 → `{"ok":true}` ✅
+  - INSERT en `mensajes_desconocidos` verificado ✅
+- [x] M.10 — **Test de envío** (`enviar-mensaje`):
+  - Template `recordatorio_-1` → `{"ok":true, "message_id":"wamid.HBgN..."}` ✅
+  - INSERT en `mensajes_enviados` verificado ✅
+
+### Lecciones Aprendidas
+
+1. **Usar System User + Permanent Token** desde el principio — evita el refresh eterno cada 24h
+2. **WhatsApp Phone Number ID** cambia entre cuentas — la migración requiere actualizar `WHATSAPP_PHONE_NUMBER_ID`
+3. **Verify Token** puede mantenerse igual entre migraciones — no hay dependencia con la app
+4. **HMAC signature** depende de `WHATSAPP_APP_SECRET` — si cambia el secret, el webhook rechaza y hay que actualizar
+5. **pg_cron** no requiere cambios después de migración (solo necesita la función redeployeada)
 
 ---
 
