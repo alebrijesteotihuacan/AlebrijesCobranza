@@ -109,6 +109,26 @@ async function sendToWhatsApp(to: string, body: string): Promise<{ ok: boolean; 
   return { ok: true, message_id: messageId };
 }
 
+// ---------- Query message status via Meta API ----------
+async function getMessageStatus(wamid: string): Promise<{ status: string; raw: unknown }> {
+  const url = `${META_BASE_URL}/${wamid}`;
+  const res = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${WHATSAPP_TOKEN}`,
+    },
+  });
+  const json = await res.json().catch(() => ({} as Record<string, unknown>));
+  if (!res.ok) {
+    return { status: `error: HTTP ${res.status}`, raw: json };
+  }
+  // Meta returns conversation + pricing; delivery status is under messaging_status or status field
+  const status = (json as { status?: string; messaging_status?: string }).status
+    ?? (json as { messages?: Array<{ status?: string }> }).messages?.[0]?.status
+    ?? "unknown";
+  return { status, raw: json };
+}
+
 async function logMensaje(args: {
   clienteId: string;
   periodo: string;
@@ -137,6 +157,29 @@ async function logMensaje(args: {
 
 // ---------- Main ----------
 async function handle(req: Request): Promise<Response> {
+  // GET: query message or phone status
+  if (req.method === "GET") {
+    const url = new URL(req.url);
+    const wamid = url.searchParams.get("wamid");
+    const phoneStats = url.searchParams.get("phone_stats");
+
+    // Phone number quality rating
+    if (phoneStats === "1") {
+      const metaUrl = `${META_BASE_URL}/${WHATSAPP_PHONE_ID}?fields=id,display_phone_number,verified_name,quality_rating,account_mode,status,code_verification_status,health_status`;
+      const res = await fetch(metaUrl, {
+        headers: { "Authorization": `Bearer ${WHATSAPP_TOKEN}` },
+      });
+      const json = await res.json().catch(() => ({}));
+      return jsonResponse({ ok: res.ok, phone: json }, res.status);
+    }
+
+    if (!wamid) {
+      return jsonResponse({ ok: false, error: "Missing ?wamid= or ?phone_stats=1 parameter" }, 400);
+    }
+    const result = await getMessageStatus(wamid);
+    return jsonResponse({ ok: true, wamid, ...result }, 200);
+  }
+
   if (req.method !== "POST") {
     return new Response("Method Not Allowed", { status: 405 });
   }

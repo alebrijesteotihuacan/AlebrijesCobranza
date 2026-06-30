@@ -1385,6 +1385,78 @@ Una vez agregada en Vercel, el dashboard cargará correctamente con los KPIs rea
 
 ---
 
+## 🐛 Diagnóstico: Mensajes NO entregados a números nuevos (30-Jun-2026)
+
+> **Síntoma:** Solo Haziel (525528426523) recibió los 8 mensajes. Los otros 3 clientes (Juan Manuel, Hector, Cliente 525510087435) no recibieron nada en su WhatsApp, aunque Meta devolvió `ok: true` con `whatsapp_message_id` válido.
+
+### Causa raíz (encontrada via `health_status` API)
+
+El `phone_number_id` `1111071985433084` (Charlo) tiene **2 restricciones activas** en Meta:
+
+| Entidad | Status | Detalle |
+|---------|--------|---------|
+| **PHONE_NUMBER** | `LIMITED` | **"Your display name has not been approved yet. Your message limit will increase after the display name is approved."** |
+| **BUSINESS** | `LIMITED` | **Error 141010: "The Business has not passed business verification."** |
+| WABA | `AVAILABLE` | ✅ OK |
+| APP | `AVAILABLE` | ✅ OK |
+
+### Por qué solo Haziel recibió
+
+Meta tiene un "tier" de envío por número de teléfono. Cuando el display name y la business verification no están aprobados:
+
+- ✅ **Contactos previos** (que ya interactuaron con el número) → se entregan normalmente
+- ❌ **Números nuevos** (sin contacto previo) → Meta acepta la request (`ok: true`) pero **NO entrega** el mensaje
+
+Haziel era contacto tuyo, por eso le llegaron. Los otros 3 no habían tenido contacto previo, por eso Meta los filtró.
+
+### Comando de diagnóstico
+
+Se agregó un endpoint de debug a la Edge Function `enviar-mensaje`:
+
+```bash
+GET https://wcsqafedvjjwtntepmhf.supabase.co/functions/v1/enviar-mensaje?phone_stats=1
+```
+
+Devuelve el `health_status` del phone_number_id con todas las entidades (PHONE_NUMBER, WABA, BUSINESS, APP) y sus restricciones.
+
+### Solución (acciones manuales en Meta Business Manager)
+
+Esto **NO es un fix de código**. El admin del club tiene que:
+
+#### 1. Aprobar el Display Name
+1. Ir a [business.facebook.com](https://business.facebook.com)
+2. WhatsApp Manager → Phone Numbers
+3. Click en el número `+52 1 56 6081 5862`
+4. Sección **Display Name** → enviar para aprobación
+5. Esperar 1-3 días
+
+#### 2. Completar la verificación de Business
+1. [business.facebook.com/settings/security](https://business.facebook.com/settings/security)
+2. Business Verification → iniciar/continuar
+3. Meta pide: RFC del club, comprobante de domicilio, identificación del representante legal
+4. Esperar 1-7 días
+
+#### 3. Una vez completado
+- `health_status.can_send_message`: `LIMITED` → `AVAILABLE`
+- Los envíos a números nuevos empezarán a entregarse
+- El quality rating se mantiene en GREEN
+
+### Verificación
+
+Después de la aprobación, ejecutar de nuevo el endpoint de debug:
+
+```bash
+curl -H "Authorization: Bearer $SVC" "https://wcsqafedvjjwtntepmhf.supabase.co/functions/v1/enviar-mensaje?phone_stats=1"
+```
+
+Si `health_status.can_send_message = "AVAILABLE"` y `health_status.entities[*].can_send_message` ya no es `LIMITED`, el problema está resuelto.
+
+### Lección aprendida
+
+Antes de hacer pruebas de envío masivo, **siempre verificar primero** el `health_status` del phone number. El endpoint de debug agregado a `enviar-mensaje` se puede usar para esto en el futuro.
+
+---
+
 ## 🧪 Smoke Tests Finales
 
 > **Fecha de ejecución:** 30-Jun-2026
