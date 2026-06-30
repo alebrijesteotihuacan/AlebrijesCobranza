@@ -430,7 +430,7 @@
 
 - [x] 4.1.1 — Usuario admin creado via GoTrue admin API:
   - **Email:** `admin@alebrijes.com`
-  - **Password:** `AlebrijesCobranza2026!` (⚠️ cambiar después de Fase 8)
+  - **Password:** `Alebrijes123` (rotado 30-Jun-2026)
   - **UUID:** `e801fcf6-4ea1-4a29-b0d3-124110288d72`
   - **email_confirmed_at:** confirmado automáticamente
   - **user_metadata:** `{nombre: "Admin Alebrijes", rol: "admin"}`
@@ -1133,7 +1133,7 @@ Route (app)
   - **Credenciales a compartir**:
     - URL: `https://alebrijes-cobranza.vercel.app`
     - Email: `admin@alebrijes.com`
-    - Password: `AlebrijesCobranza2026!` (⚠️ debe cambiarse después del primer login)
+    - Password: `Alebrijes123`
   - **Canales seguros documentados** en `OPERATIONS.md`:
     - ✅ Recomendados: 1Password/Bitwarden (compartir item), Google Password Manager, llamada telefónica
     - ❌ Evitar: email, WhatsApp, SMS, Slack público, GitHub Issues
@@ -1328,6 +1328,42 @@ Una vez agregada en Vercel, el dashboard cargará correctamente con los KPIs rea
 3. **Verify Token** puede mantenerse igual entre migraciones — no hay dependencia con la app
 4. **HMAC signature** depende de `WHATSAPP_APP_SECRET` — si cambia el secret, el webhook rechaza y hay que actualizar
 5. **pg_cron** no requiere cambios después de migración (solo necesita la función redeployeada)
+
+---
+
+## 📨 Smoke Test de Envío Masivo (30-Jun-2026)
+
+> **Cliente:** "Haziel Alejandro Mercado Macias" (whatsapp 525528426523, dia_pago=30, monto=$5900)
+> **Objetivo:** Verificar que los 8 mensajes se envían correctamente via Meta API
+> **Método:** Script Node.js que llama a `enviar-mensaje` Edge Function 8 veces
+
+### Resultado: 8/8 mensajes enviados ✅
+
+| # | Plantilla | Offset | Estado | WhatsApp Message ID |
+|---|-----------|--------|--------|---------------------|
+| 1 | `recordatorio_-3` | -3 | enviado | `wamid.HBgNNTIxNTUyODQyNjUyMxUCABEYEjExODAyM0U5MzNFRjg2QkFGOQA=` |
+| 2 | `recordatorio_-1` | -1 | enviado | `wamid.HBgNNTIxNTUyODQyNjUyMxUCABEYEjc0NDI1Rjg4M0U3QjkyOTNCMgA=` |
+| 3 | `pago_hoy` | 0 | enviado | `wamid.HBgNNTIxNTUyODQyNjUyMxUCABEYEjA1QjEwQzAyQThGMDYyQTIyMAA=` |
+| 4 | `atraso_1` | 1 | enviado | `wamid.HBgNNTIxNTUyODQyNjUyMxUCABEYEjQ1MTM2NzdERkQ1RUEwMDUzNgA=` |
+| 5 | `atraso_3` | 3 | enviado | `wamid.HBgNNTIxNTUyODQyNjUyMxUCABEYEkQ5MEVFOTI5ODhDOUI5NjhBOAA=` |
+| 6 | `atraso_7` | 7 | enviado | `wamid.HBgNNTIxNTUyODQyNjUyMxUCABEYEjk5RkJFMzczQkE0NTA0MzU3NQA=` |
+| 7 | `pago_validado` | 999 | enviado | `wamid.HBgNNTIxNTUyODQyNjUyMxUCABEYEjczODUxNTYyMUUzNzkyNzhDOQA=` |
+| 8 | `pago_rechazado` | 998 | enviado | `wamid.HBgNNTIxNTUyODQyNjUyMxUCABEYEkQ4QTc0NUFGNjBDNDg4OUVFRAA=` |
+
+### Conclusiones
+
+- ✅ Meta API aceptó los 8 mensajes (HTTP 200, ok=true)
+- ✅ `mensajes_enviados` registró los 8 con offset_dias correcto
+- ✅ Variables del template renderizadas: nombre, dia_pago, monto, info_pago
+- ✅ Edge function `enviar-mensaje` operativa y respondiendo correctamente
+- ℹ️ El cliente real recibió 8 mensajes en su WhatsApp
+- ⚠️ Estos mensajes NO deberían dispararse en producción por el cron (el cron tiene dedupe), pero el test manual via Edge Function los forzó
+
+### Lecciones aprendidas
+
+- La Edge Function `enviar-mensaje` **no tiene dedupe** — siempre inserta en `mensajes_enviados`
+- El dedupe está en `enviar-recordatorios` (cron) — verifica si ya se envió para mismo `cliente_id+periodo+offset_dias`
+- En producción, el cron no enviará duplicados automáticamente
 
 ---
 
