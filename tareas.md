@@ -1365,6 +1365,24 @@ Una vez agregada en Vercel, el dashboard cargará correctamente con los KPIs rea
 - El dedupe está en `enviar-recordatorios` (cron) — verifica si ya se envió para mismo `cliente_id+periodo+offset_dias`
 - En producción, el cron no enviará duplicados automáticamente
 
+### Segundo cliente — Juan Manuel Macias Velazquez (525624608936)
+
+> **Cliente creado:** ID `a27a968c-a158-4e02-a034-2e4dede8212c`, whatsapp `525624608936`, dia_pago=30, monto=$5900
+> **Resultado:** 8/8 mensajes enviados ✅
+
+| # | Plantilla | Offset | Estado | Message ID (preview) |
+|---|-----------|--------|--------|----------------------|
+| 1 | `recordatorio_-3` | -3 | enviado | `wamid.HBgNNTIxNTYyNDYwODkzNhUCABEYEjExNzk3QTU1MTZCRDE1Njg2NgA=` |
+| 2 | `recordatorio_-1` | -1 | enviado | `wamid.HBgNNTIxNTYyNDYwODkzNhUCABEYEjM4Q0E1OUJBRTI5RjM5MDE5MgA=` |
+| 3 | `pago_hoy` | 0 | enviado | `wamid.HBgNNTIxNTYyNDYwODkzNhUCABEYEkE1MjM3QUFFREE4NTMwRDBBNgA=` |
+| 4 | `atraso_1` | 1 | enviado | `wamid.HBgNNTIxNTYyNDYwODkzNhUCABEYEkQwOTY5RTU3N0I5MkNBRUMxMQA=` |
+| 5 | `atraso_3` | 3 | enviado | `wamid.HBgNNTIxNTYyNDYwODkzNhUCABEYEkVGRTgzMkE0M0Y3RkJBQTcyRAA=` |
+| 6 | `atraso_7` | 7 | enviado | `wamid.HBgNNTIxNTYyNDYwODkzNhUCABEYEkRFRkRDQzA4MTZEMTBDNDVFNwA=` |
+| 7 | `pago_validado` | 999 | enviado | `wamid.HBgNNTIxNTYyNDYwODkzNhUCABEYEkU5M0Q0M0EyOUQwMjZCQTVCRgA=` |
+| 8 | `pago_rechazado` | 998 | enviado | `wamid.HBgNNTIxNTYyNDYwODkzNhUCABEYEjdDN0FENDUyODAwRkREODQzQwA=` |
+
+**Total en producción: 16/16 mensajes enviados a 2 clientes.**
+
 ---
 
 ## 🧪 Smoke Tests Finales
