@@ -5,11 +5,18 @@ import { createClient } from "@supabase/supabase-js";
  * Bypasses RLS — never expose this to the browser.
  */
 export function getAdminClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { persistSession: false, autoRefreshToken: false } },
-  );
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) {
+    throw new Error(
+      "Falta SUPABASE_SERVICE_ROLE_KEY o NEXT_PUBLIC_SUPABASE_URL. " +
+      "Agregar la key en .env.local (local) y Vercel Environment Variables (producción). " +
+      "Ver docs/OPERATIONS.md o tareas.md → Sección 'Migración 3ra cuenta de Meta'.",
+    );
+  }
+  return createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
 }
 
 export interface Cliente {

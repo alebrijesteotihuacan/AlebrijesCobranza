@@ -1234,6 +1234,54 @@ Route (app)
 
 ---
 
+## 🐛 Bug Fix Crítico: `SUPABASE_SERVICE_ROLE_KEY` faltante
+
+> **Fecha:** 30-Jun-2026
+> **Síntoma:** Después de login, `/dashboard` devolvía `ERROR 754823086` (Vercel 500 "This page couldn't load").
+
+### Causa raíz
+
+- `app/dashboard/page.tsx` y `lib/queries/{clientes,dashboard,badges}.ts` usan `getAdminClient()` que requiere `process.env.SUPABASE_SERVICE_ROLE_KEY`
+- Esa variable **nunca estuvo** en `.env.local` (solo las 4 `NEXT_PUBLIC_*`)
+- `.env.example` indicaba incorrectamente: *"Secretos de Edge Functions (NO se ponen en .env.local)"* — engañoso, esa nota aplica a las keys de Meta pero NO a `SUPABASE_SERVICE_ROLE_KEY`
+- En Vercel tampoco estaba configurada
+- El login funcionaba (usa `NEXT_PUBLIC_SUPABASE_ANON_KEY`) pero al cargar `/dashboard`, las queries con `getAdminClient()` crasheaban → Vercel 500
+
+### Fix aplicado
+
+- [x] F.1 — **Agregar `SUPABASE_SERVICE_ROLE_KEY` a `.env.local`** (no se commitea, está en `.gitignore`)
+  - Valor: la service_role key del proyecto Supabase `wcsqafedvjjwtntepmhf`
+- [x] F.2 — **Actualizar `.env.example`** con sección dedicada:
+  - Documenta que `SUPABASE_SERVICE_ROLE_KEY` es REQUERIDA para el dashboard
+  - Instrucciones para `.env.local` y para Vercel Environment Variables
+- [x] F.3 — **Hacer `getAdminClient()` fail-fast con mensaje claro** (`lib/queries/clientes.ts`):
+  - Throw con mensaje que dice exactamente qué variable falta y cómo agregarla
+- [x] F.4 — **Hacer `/dashboard` defensivo** (`app/dashboard/page.tsx`):
+  - `try/catch` alrededor del `Promise.all` de queries
+  - Si fallan, muestra dashboard con KPIs en 0 + banner rojo con el error exacto
+  - Usuario ve el problema en vez de "This page couldn't load"
+
+### ⚠️ Acción manual requerida en Vercel
+
+El fix local está listo, pero el deploy de Vercel **seguirá fallando** hasta que se agregue la variable en Vercel:
+
+1. Ir a [vercel.com](https://vercel.com) → proyecto `alebrijes-cobranza` → **Settings** → **Environment Variables**
+2. Agregar nueva variable:
+   - **Name:** `SUPABASE_SERVICE_ROLE_KEY`
+   - **Value:** la service_role key (mismo valor que está en `.env.local`)
+   - **Environments:** Production, Preview, Development (marcar las 3)
+3. Click **Save**
+4. Redeploy: **Deployments** → último deploy → **⋯** → **Redeploy**
+
+Una vez agregada en Vercel, el dashboard cargará correctamente con los KPIs reales.
+
+### Lección aprendida
+
+- Toda variable de entorno usada por Server Components debe estar documentada en `.env.example` y agregada tanto en `.env.local` (dev) como en Vercel (prod)
+- El fail-fast en `getAdminClient()` evita futuros "This page couldn't load" sin contexto
+
+---
+
 ## 🔄 Migración a 3ra Cuenta de Meta
 
 > **Fecha:** 30-Jun-2026

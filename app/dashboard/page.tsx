@@ -21,16 +21,41 @@ import {
 import { getClientes } from "@/lib/queries/clientes";
 import { formatMXN, formatWhatsApp, formatRelativeTime } from "@/lib/utils";
 import type { Cliente } from "@/lib/queries/clientes";
+import type { KpiSnapshot, MorosoItem, PorVencerItem } from "@/lib/queries/dashboard";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const [kpis, morosos, porVencer, allClientes] = await Promise.all([
-    getDashboardKpis(),
-    getMorososList(5),
-    getPorVencerList(5),
-    getClientes({ includeInactive: true }),
-  ]);
+  // Defensive: if SUPABASE_SERVICE_ROLE_KEY is missing, queries throw.
+  // Show empty dashboard instead of 500 page so the user can see the warning.
+  let kpis: KpiSnapshot;
+  let morosos: MorosoItem[];
+  let porVencer: PorVencerItem[];
+  let allClientes: Cliente[] = [];
+  let queryError: string | null = null;
+  try {
+    [kpis, morosos, porVencer, allClientes] = await Promise.all([
+      getDashboardKpis(),
+      getMorososList(5),
+      getPorVencerList(5),
+      getClientes({ includeInactive: true }),
+    ]);
+  } catch (e) {
+    console.error("Dashboard query failed:", e);
+    queryError = e instanceof Error ? e.message : "Unknown error";
+    kpis = {
+      periodo: new Date().toISOString().slice(0, 7),
+      periodoLabel: new Date().toLocaleDateString("es-MX", { month: "long", year: "numeric" }),
+      cobrado: 0,
+      pagosCount: 0,
+      morososCount: 0,
+      porVencerCount: 0,
+      pendientesCount: 0,
+      totalClientesActivos: 0,
+    };
+    morosos = [];
+    porVencer = [];
+  }
 
   const recientes = allClientes.slice(0, 5);
   const cobranzaRatio = kpis.totalClientesActivos > 0
@@ -39,6 +64,20 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6 sm:space-y-8">
+      {queryError && (
+        <div className="rounded-lg border border-alebrijes-red/30 bg-alebrijes-red/5 p-4">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-alebrijes-red shrink-0 mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-alebrijes-red">No se pudieron cargar los datos</p>
+              <p className="text-sm text-zinc-700 mt-1">
+                Probablemente falta la variable <code className="font-mono text-xs bg-zinc-100 px-1 py-0.5 rounded">SUPABASE_SERVICE_ROLE_KEY</code> en Vercel o en <code className="font-mono text-xs bg-zinc-100 px-1 py-0.5 rounded">.env.local</code>.
+              </p>
+              <p className="text-xs text-zinc-600 mt-2 font-mono break-all">{queryError}</p>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
         <div>
