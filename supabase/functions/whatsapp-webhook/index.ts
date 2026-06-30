@@ -5,9 +5,9 @@
 // - POST : incoming messages; downloads media, stores it, creates comprobante
 // =============================================================
 
-// @ts-ignore — Deno-specific import
+// @ts-expect-error — Deno-specific import
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-// @ts-ignore — Deno-specific import
+// @ts-expect-error — Deno-specific import
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 
 // ---------- Env ----------
@@ -292,10 +292,9 @@ async function handlePost(req: Request): Promise<Response> {
     return new Response("Invalid signature", { status: 401 });
   }
 
-  // deno-lint-ignore no-explicit-any
-  let payload: any;
+  let payload: unknown;
   try {
-    payload = JSON.parse(rawBody);
+    payload = JSON.parse(rawBody) as unknown;
   } catch (e) {
     console.error("Invalid JSON", e);
     return new Response("Bad Request", { status: 400 });
@@ -303,7 +302,8 @@ async function handlePost(req: Request): Promise<Response> {
 
   // Respond fast (Meta retries if >5s). Process in background.
   // For simplicity we await; messages are usually small.
-  const entries = payload.entry ?? [];
+  const p = payload as { entry?: Array<{ changes?: Array<{ value?: { messages?: Array<Record<string, unknown>>; metadata?: { phone_number_id?: string } } }> }> };
+  const entries = p.entry ?? [];
   for (const entry of entries) {
     for (const change of entry.changes ?? []) {
       const value = change.value ?? {};

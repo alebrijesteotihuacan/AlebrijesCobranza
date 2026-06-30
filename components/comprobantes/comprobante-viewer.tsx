@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Download, FileText, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,10 +21,14 @@ interface Props {
 
 export function ComprobanteViewer({ open, onOpenChange, tipo, signedUrl, nombre }: Props) {
   const [loading, setLoading] = useState(true);
+  const [lastOpen, setLastOpen] = useState(open);
+  const [lastUrl, setLastUrl] = useState(signedUrl);
 
-  useEffect(() => {
-    if (open) setLoading(true);
-  }, [open, signedUrl]);
+  if (open !== lastOpen || signedUrl !== lastUrl) {
+    setLastOpen(open);
+    setLastUrl(signedUrl);
+    setLoading(true);
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

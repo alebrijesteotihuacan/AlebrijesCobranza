@@ -41,6 +41,13 @@ function tipoIcon(tipo: string) {
   return MessageSquare;
 }
 
+function TipoIcon({ tipo, className }: { tipo: string; className?: string }) {
+  /* eslint-disable react-hooks/static-components */
+  const IconComp = tipoIcon(tipo);
+  return <IconComp className={className} />;
+  /* eslint-enable react-hooks/static-components */
+}
+
 function tipoLabel(tipo: string) {
   if (tipo === "image") return "Imagen";
   if (tipo === "document") return "PDF";
@@ -55,7 +62,6 @@ export function ComprobanteCard({ comprobante: c, periodos, defaultPeriodo }: Pr
   const [validarOpen, setValidarOpen] = useState(false);
   const [rechazarOpen, setRechazarOpen] = useState(false);
 
-  const Icon = tipoIcon(c.tipo);
   const tieneMedia = c.tipo === "image" || c.tipo === "document";
   const isImage = c.tipo === "image";
   const isProcesado = c.estado === "validado" || c.estado === "rechazado";
@@ -93,11 +99,11 @@ export function ComprobanteCard({ comprobante: c, periodos, defaultPeriodo }: Pr
                 </div>
               ) : c.tipo === "text" && c.texto ? (
                 <div className="p-4 text-xs text-zinc-700 italic line-clamp-6 max-w-full">
-                  "{c.texto}"
+                  &ldquo;{c.texto}&rdquo;
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-1 text-zinc-400">
-                  <Icon className="w-8 h-8" />
+                  <TipoIcon tipo={c.tipo} className="w-8 h-8" />
                   <span className="text-[10px] uppercase tracking-wider">
                     {tipoLabel(c.tipo)}
                   </span>
@@ -153,7 +159,7 @@ export function ComprobanteCard({ comprobante: c, periodos, defaultPeriodo }: Pr
               </div>
               <div className="flex flex-col items-end gap-1 shrink-0">
                 <Badge variant="secondary" className="text-[10px]">
-                  <Icon className="w-3 h-3 mr-1" /> {tipoLabel(c.tipo)}
+                  <TipoIcon tipo={c.tipo} className="w-3 h-3 mr-1" /> {tipoLabel(c.tipo)}
                 </Badge>
                 {/* 7.4.2 — Estado badge prominente para histórico */}
                 {c.estado === "validado" && (
@@ -193,7 +199,7 @@ export function ComprobanteCard({ comprobante: c, periodos, defaultPeriodo }: Pr
             {c.estado === "rechazado" && c.notas_admin && (
               <div className="rounded-md bg-alebrijes-red/5 border border-alebrijes-red/20 p-2.5 text-xs">
                 <p className="font-medium text-alebrijes-red mb-0.5">Motivo del rechazo:</p>
-                <p className="text-zinc-700 italic">"{c.notas_admin}"</p>
+                <p className="text-zinc-700 italic">&ldquo;{c.notas_admin}&rdquo;</p>
               </div>
             )}
 

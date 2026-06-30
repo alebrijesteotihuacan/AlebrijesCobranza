@@ -37,8 +37,8 @@ export default async function ReportesPage({ searchParams }: PageProps) {
 
   // Compute previous / next periodo for nav arrows
   const [yStr, mStr] = data.periodo.split("-");
-  let y = Number(yStr);
-  let m = Number(mStr);
+  const y = Number(yStr);
+  const m = Number(mStr);
   const prev = (() => {
     const d = new Date(y, m - 2, 1);
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;

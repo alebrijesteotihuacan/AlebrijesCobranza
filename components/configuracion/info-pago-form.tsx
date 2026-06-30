@@ -49,7 +49,7 @@ export function InfoPagoForm({ initialValue }: Props) {
           <Wallet className="w-4 h-4" /> Información de pago
         </CardTitle>
         <CardDescription>
-          Este texto se incluye automáticamente en los mensajes de "hoy es tu fecha de pago" y en los de atraso.
+          Este texto se incluye automáticamente en los mensajes de &ldquo;hoy es tu fecha de pago&rdquo; y en los de atraso.
         </CardDescription>
       </CardHeader>
       <CardContent>

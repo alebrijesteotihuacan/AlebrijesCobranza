@@ -36,9 +36,23 @@ export function GlobalSearch() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Result[]>([]);
-  const [loading, setLoading] = useState(false);
   const [activeIdx, setActiveIdx] = useState(0);
+  const [lastOpen, setLastOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Reset state when dialog closes (render-phase update)
+  if (open !== lastOpen) {
+    setLastOpen(open);
+    if (!open) {
+      setQuery("");
+      setResults([]);
+      setActiveIdx(0);
+    }
+  }
+
+  // Loading is derived: query is long enough but no results yet for this query
+  // (Heuristic: show spinner if query is >= 2 chars and results array is empty)
+  const loading = query.length >= 2 && results.length === 0;
 
   // Open with ⌘K / Ctrl+K
   useEffect(() => {
@@ -58,21 +72,14 @@ export function GlobalSearch() {
   useEffect(() => {
     if (open) {
       setTimeout(() => inputRef.current?.focus(), 50);
-    } else {
-      setQuery("");
-      setResults([]);
-      setActiveIdx(0);
     }
   }, [open]);
 
   // Debounced fetch
   useEffect(() => {
     if (!query || query.length < 2) {
-      setResults([]);
-      setLoading(false);
       return;
     }
-    setLoading(true);
     const ctrl = new AbortController();
     const t = setTimeout(async () => {
       try {
@@ -87,8 +94,6 @@ export function GlobalSearch() {
         if ((e as { name?: string }).name !== "AbortError") {
           console.error("search error", e);
         }
-      } finally {
-        setLoading(false);
       }
     }, 200);
     return () => {
@@ -177,7 +182,7 @@ export function GlobalSearch() {
               <ul className="divide-y divide-zinc-200">
                 {results.map((r, i) => {
                   const meta = TYPE_META[r.type];
-                  const Icon = meta.icon;
+                  const IconComp = meta.icon;
                   return (
                     <li key={`${r.type}-${r.id}`}>
                       <Link
@@ -191,7 +196,7 @@ export function GlobalSearch() {
                           i === activeIdx && "bg-alebrijes-orange/5",
                         )}
                       >
-                        <Icon className={cn("h-4 w-4 shrink-0", meta.color)} />
+                        <IconComp className={cn("h-4 w-4 shrink-0", meta.color)} />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium truncate">{r.title}</p>
                           {r.subtitle && (

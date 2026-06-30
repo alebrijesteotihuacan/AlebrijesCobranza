@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Bell, BellOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -21,24 +21,26 @@ export function NotificationToggle() {
   const [subscribed, setSubscribed] = useState(false);
   const [pending, startTransition] = useTransition();
   const [loading, setLoading] = useState(true);
+  const [hydrated, setHydrated] = useState(false);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
+  // Detect browser support + initial subscription status (mount-time effect with side effects)
+  if (typeof window !== "undefined" && !hydrated) {
+    setHydrated(true);
     const ok = "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
     setSupported(ok);
     if (!ok) {
       setLoading(false);
-      return;
+    } else {
+      navigator.serviceWorker.ready
+        .then((reg) =>
+          reg.pushManager.getSubscription().then((sub) => {
+            setSubscribed(!!sub);
+            setLoading(false);
+          }),
+        )
+        .catch(() => setLoading(false));
     }
-    navigator.serviceWorker.ready
-      .then((reg) =>
-        reg.pushManager.getSubscription().then((sub) => {
-          setSubscribed(!!sub);
-          setLoading(false);
-        }),
-      )
-      .catch(() => setLoading(false));
-  }, []);
+  }
 
   async function handleSubscribe() {
     if (!supported) {

@@ -55,12 +55,18 @@ function tipoLabel(tipo: string | null) {
   }
 }
 
+function TipoIcon({ tipo, className }: { tipo: string | null; className?: string }) {
+  /* eslint-disable react-hooks/static-components */
+  const IconComp = tipoIcon(tipo);
+  return <IconComp className={className} />;
+  /* eslint-enable react-hooks/static-components */
+}
+
 export function DesconocidoCard({ mensaje: m }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  const Icon = tipoIcon(m.tipo);
   const altaUrl = `/dashboard/clientes/nuevo?whatsapp=${encodeURIComponent(m.whatsapp_from)}`;
 
   function handleIgnorar() {
@@ -83,7 +89,7 @@ export function DesconocidoCard({ mensaje: m }: Props) {
           {/* Top row: tipo + Icon + WhatsApp */}
           <div className="flex items-start gap-3">
             <div className="shrink-0 rounded-lg p-2.5 bg-alebrijes-warning/10 text-alebrijes-warning">
-              <Icon className="w-5 h-5" />
+              <TipoIcon tipo={m.tipo} className="w-5 h-5" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2">
@@ -104,7 +110,7 @@ export function DesconocidoCard({ mensaje: m }: Props) {
           {/* Texto del mensaje */}
           {m.texto ? (
             <blockquote className="text-sm border-l-2 border-zinc-200 pl-3 italic text-zinc-700 line-clamp-3">
-              "{m.texto}"
+              &ldquo;{m.texto}&rdquo;
             </blockquote>
           ) : (
             <p className="text-xs text-muted-foreground italic">

@@ -6,9 +6,9 @@
 // Skips if already sent, if already paid, or if a comprobante is validated.
 // =============================================================
 
-// @ts-ignore — Deno-specific import
+// @ts-expect-error — Deno-specific import
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-// @ts-ignore — Deno-specific import
+// @ts-expect-error — Deno-specific import
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 
 // ---------- Env ----------

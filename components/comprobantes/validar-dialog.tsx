@@ -244,10 +244,10 @@ function ComprobantePreview({
             {tipo === "image" ? "Imagen" : tipo === "document" ? "PDF" : "Texto"}
           </p>
           {caption && (
-            <p className="text-sm mt-1 line-clamp-2 italic text-zinc-700">"{caption}"</p>
+            <p className="text-sm mt-1 line-clamp-2 italic text-zinc-700">&ldquo;{caption}&rdquo;</p>
           )}
           {tipo === "text" && texto && !caption && (
-            <p className="text-sm mt-1 line-clamp-3 italic text-zinc-700">"{texto}"</p>
+            <p className="text-sm mt-1 line-clamp-3 italic text-zinc-700">&ldquo;{texto}&rdquo;</p>
           )}
           {url && (
             <Button
